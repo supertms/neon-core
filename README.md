@@ -1,34 +1,39 @@
 # Neon Core
 
-A 16:9 holographic Codex workspace prototype. This first web build validates the visual system and task-panel lifecycle before connecting a real Codex App Server session.
+A browser-based, 16:9 holographic Codex workspace prototype.
+
+## Online preview
+
+After GitHub Pages is enabled and the first deployment succeeds, the preview will be available at:
+
+<https://supertms.github.io/neon-core/>
 
 ## Run locally
 
-Requires Node.js 18+.
+No build tools or dependencies are required. Open `index.html` directly in a modern browser, or serve this folder:
 
 ```bash
-npm run dev
+python -m http.server 4173
 ```
 
-Open http://127.0.0.1:4173. No dependency installation is required.
+Then open <http://127.0.0.1:4173>.
 
 ## Demo controls
 
-- Start / Resume: continuously spawns simulated Codex task panels.
-- Pause: freezes the event stream while leaving current panels visible.
-- Inject event: spawns one additional task panel.
-- Reset: folds panels back toward the central core and returns to standby.
+- **Start / Resume**: continuously spawns simulated Codex task panels.
+- **Pause**: freezes the event stream while leaving current panels visible.
+- **Inject event**: spawns one additional task panel.
+- **Reset**: folds panels back toward the central core and returns to standby.
 
-## Prototype features
+## Visual system
 
-- 16:9 workspace shell with navigation and system status.
+- 16:9 workspace shell with navigation, sidebar, and system status.
 - Central AI core with nested cube geometry and rotating halos.
-- Recursive space frames, floor grid, and restrained blue / violet light ribbons.
-- Multi-angle holographic panels: task, plan, command log, code diff, project files, tests, analysis, and metrics.
-- Lower horizontal workbench panels.
+- Recursive spatial frames, floor grid, and restrained blue / violet light ribbons.
+- Dense, multi-angle holographic panels and a lower horizontal workbench.
 - Panel lifecycle: materialize → unfold → active → retreat → fold → dissolve.
-- Simulated task events only; real Codex integration is planned for a later phase.
+- Responsive visual layout designed for desktop browser testing.
 
-## Deployment
+## Integration status
 
-The project is configured for GitHub Pages deployment from the `main` branch using GitHub Actions. The online preview will be available at https://supertms.github.io/neon-core/ after the first successful deployment.
+This is a visual prototype. Codex events are simulated; it does not yet connect to a real Codex App Server session or access project files. Real session integration is planned for a later phase.
