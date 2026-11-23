@@ -1,4 +1,4 @@
-/* Pixel Genesis v0.3 — the PIXELS ARE THE PANEL, not particles above it.
+/* Pixel Genesis v0.4 — the PIXELS ARE THE PANEL, not particles above it.
    The canvas samples each panel's final UI and progressively reconstructs it. */
 .panel.pixel-assembling {
   opacity:1;
@@ -38,4 +38,44 @@
   .panel.pixel-assembling .panel-pixel-canvas {display:none!important}
   .panel.pixel-assembling .panel-head,
   .panel.pixel-assembling .panel-content {visibility:visible!important}
+}
+
+/* v0.4 neon-matrix: more vivid only during genesis, stable panels remain readable */
+.panel.pixel-assembling .panel-pixel-canvas{
+  filter:drop-shadow(0 0 4px rgba(66,218,255,.62))
+         drop-shadow(0 0 7px rgba(200,72,255,.25))
+         saturate(1.65) brightness(1.32);
+  mix-blend-mode:screen;
+}
+.panel.pixel-assembling[data-spawn-mode="glitch"] .panel-pixel-canvas{
+  filter:drop-shadow(0 0 5px rgba(255,68,195,.58))
+         drop-shadow(0 0 7px rgba(78,222,255,.44))
+         saturate(1.72) brightness(1.35);
+}
+.panel.pixel-assembling[data-spawn-mode="voxel"] .panel-pixel-canvas{
+  filter:drop-shadow(0 0 5px rgba(149,88,255,.55))
+         saturate(1.8) brightness(1.37);
+}
+.panel.pixel-assembling[data-spawn-mode="lattice"] .panel-pixel-canvas{
+  filter:drop-shadow(0 0 3px rgba(65,223,255,.5))
+         saturate(1.54) brightness(1.3);
+}
+.controls .palette-control{
+  border-color:rgba(240,92,200,.54);
+  color:#f6c1ef;
+  background:linear-gradient(120deg,#21163a,#142a45 48%,#3c1b39);
+  box-shadow:inset 0 0 10px rgba(202,83,228,.1);
+}
+.controls .palette-control:hover{
+  border-color:#f798e2;
+  color:#fff;
+}
+.controls .palette-control::before{
+  content:"";display:inline-block;width:13px;height:5px;
+  background:linear-gradient(90deg,#32dfff,#8c62ff,#ff52cd,#ff9566);
+  border-radius:2px;margin-right:6px;
+  box-shadow:0 0 5px rgba(255,104,218,.65);
+}
+@media (prefers-reduced-motion:reduce){
+  .panel.pixel-assembling .panel-pixel-canvas{filter:none!important}
 }
