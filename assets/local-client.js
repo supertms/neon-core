@@ -84,8 +84,8 @@
         line:String(item.text||'Receiving response...'),w:228,h:140 };
       case 'plan': return {kind:'plan',icon:'▣',title:'LIVE · PLAN',
         line:String(item.text||'Working on plan'),w:225,h:153 };
-      case 'mcpToolCall': return {kind:'analysis',icon:'⌁',title:'TOOL · '+(item.tool||'Call'),
-        line:'Tool request',w:215,h:140 };
+      case 'mcpToolCall': return {kind:'analysis',icon:'⌁',title:'LIVE · TOOL',
+        line:'Tool: '+String(item.tool||'unknown'),w:215,h:140 };
       default:return null;
     }
   }
