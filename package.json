@@ -1,0 +1,14 @@
+{
+  "name": "neon-core",
+  "version": "0.9.0",
+  "private": true,
+  "type": "module",
+  "description": "Neon Core holographic Codex client (public visual preview + secure localhost bridge)",
+  "scripts": {
+    "local": "node local/server.mjs",
+    "test": "node --test local/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
