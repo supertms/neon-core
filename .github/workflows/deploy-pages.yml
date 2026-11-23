@@ -26,16 +26,29 @@ jobs:
         uses: actions/configure-pages@v5
         with:
           enablement: true
-      - name: Validate source scripts and assets
+      - name: Validate classic scene and interface
         run: |
-          node --check assets/pixel-genesis.js
-          node --check assets/panel-raster.js
-          node -e 'const fs=require("fs");const html=fs.readFileSync("index.html","utf8");new Function(html.split("<script>").pop().split("</script>")[0]);["assets/pixel-genesis.css","assets/pixel-genesis.js","assets/panel-raster.css","assets/panel-raster.js"].forEach(p=>{if(!fs.existsSync(p))throw Error("Missing "+p)});if(!html.includes("id=\"fxmode\""))throw Error("Missing FX switch");if(!html.includes("layer.appendChild(p);\n  const pixelArrival"))throw Error("Panel rasterization requires mounted DOM");console.log("Neon Core raster source checks passed")'
+          node - <<'NODE'
+          const fs=require('fs');
+          const html=fs.readFileSync('index.html','utf8');
+          const css=fs.readFileSync('assets/neon-classic.css','utf8');
+          const scripts=html.match(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)||[];
+          for(const script of scripts) {
+            const code=script.replace(/^<script(?:\s[^>]*)?>/,'').replace(/<\/script>$/,'');
+            new Function(code);
+          }
+          for(const token of ['core core-prism','prism-inner','prism-outer','status-card','newDemo','panel entering']){
+            if(!html.includes(token))throw new Error('Missing scene element: '+token);
+          }
+          if(html.includes('NeonPixel')||html.includes('panel-raster.js'))throw new Error('Pixel FX must be removed from Classic Glass preview');
+          if(!css.includes('.panel{')||!css.includes('.status-card'))throw new Error('Missing classic glass CSS');
+          console.log('Classic Glass scene checks passed');
+          NODE
       - name: Prepare static site
         run: |
-          mkdir -p _site
+          mkdir -p _site/assets
           cp index.html _site/index.html
-          cp -R assets _site/assets
+          cp assets/neon-classic.css _site/assets/neon-classic.css
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
