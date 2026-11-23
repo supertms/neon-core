@@ -53,3 +53,59 @@
   #neon-local{bottom:128px}
   #neon-local.minimized{bottom:131px}
 }
+
+
+/* v0.10: explicit read/write session selection and real diff inspection */
+#neon-local select {
+  display:block;width:100%;padding:8px 10px;
+  color:#dcf3ff;border-radius:6px;
+  background:#071c30;
+  border:1px solid rgba(73,176,221,.51);
+  font:11px "Segoe UI","Microsoft YaHei",sans-serif;
+  cursor:pointer;
+}
+#neon-local select:focus-visible {
+  outline:2px solid #69ddff;outline-offset:2px;
+}
+#neon-local .local-permission {
+  font-size:10px;color:#90c6df;
+  background:rgba(14,56,79,.27);
+  border:1px solid rgba(70,173,209,.17);
+  border-radius:6px;padding:8px;line-height:1.5;
+  margin-top:6px;
+}
+#neon-local .local-permission.write {
+  color:#ffd19a;background:rgba(117,69,25,.24);
+  border-color:rgba(239,183,89,.43);
+}
+#local-diff-modal {
+  width:min(880px,calc(100vw - 90px));
+  max-height:min(80vh,810px);
+  color:#d0eafb;
+  background:linear-gradient(145deg,#061c30,#071325 90%);
+  border:1px solid #5ddaff;
+  border-radius:12px;
+  box-shadow:0 0 28px rgba(60,192,255,.22),0 28px 75px rgba(0,6,19,.85);
+  padding:0;
+}
+#local-diff-modal::backdrop {background:rgba(0,8,20,.72);backdrop-filter:blur(4px)}
+#local-diff-modal header{
+  padding:15px 20px;background:linear-gradient(100deg,#123e5c,#111f42);
+  border-bottom:1px solid rgba(96,215,255,.25);
+  display:flex;gap:12px;align-items:center;justify-content:space-between
+}
+#local-diff-modal header button{
+  color:#bcf3ff;background:#103850;border:1px solid #458fad;
+  border-radius:5px;padding:6px 10px;cursor:pointer
+}
+#local-diff-modal .diff-legend {padding:10px 20px;font-size:11px;color:#95b9d1}
+#local-diff-modal pre {
+  margin:0;padding:12px 18px 22px;
+  overflow:auto;max-height:calc(80vh - 110px);
+  color:#b8d6e9;white-space:pre-wrap;
+  font:12px/1.65 Consolas,Monaco,monospace;tab-size:2
+}
+#local-diff-modal .added{display:block;color:#89e9b2;background:rgba(29,111,68,.17)}
+#local-diff-modal .removed{display:block;color:#ff9aaf;background:rgba(111,28,52,.2)}
+#local-diff-modal .hunk{display:block;color:#9ce4ff;background:rgba(47,113,168,.14)}
+#local-diff-modal .file{display:block;color:#c1acff;font-weight:600;margin-top:8px}
