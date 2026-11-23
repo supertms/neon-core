@@ -26,7 +26,7 @@ echo [Neon Core] Closing this window stops the local connection.
 echo.
 
 rem Browser is opened after the local server has started listening.
-start "" cmd /c "timeout /t 3 /nobreak >nul & start "" "http://127.0.0.1:4173/""
+start "" /min powershell -NoProfile -Command "Start-Sleep -Seconds 2; Start-Process 'http://127.0.0.1:4173/'"
 node local\server.mjs
 if errorlevel 1 (
   echo.
