@@ -10,30 +10,46 @@
     '<strong>LIVE CODEX · LOCAL</strong><button class="minimize" id="local-min">−</button></div>',
     '<div class="local-body">',
       '<div><div class="local-caption">01 · Choose project</div>',
-      '<label for="local-cwd">本机项目绝对路径（只读模式）</label>',
+      '<label for="local-cwd">本机项目绝对路径（只读模式为默认）</label>',
       '<input id="local-cwd" autocomplete="off" spellcheck="false" placeholder="C:\\\\Projects\\\\my-app">',
+      '<label for="local-mode" style="margin-top:8px">本次会话权限</label>',
+      '<select id="local-mode">',
+      '<option value="readOnly">只读分析（默认，不能修改文件）</option>',
+      '<option value="workspaceWrite">允许修改所选项目（需单独确认）</option>',
+      '</select>',
+      '<div class="local-permission" id="local-permission">只读模式：Codex 可以分析文件；修改能力关闭。</div>',
       '<div class="btn-row" style="margin-top:8px">',
       '<button id="local-connect">连接 Codex</button>',
       '<span class="read-only" id="local-state">尚未连接</span></div></div>',
       '<div><div class="local-caption">02 · Ask GPT / Codex</div>',
-      '<label for="local-prompt">发送真实任务（第一版不允许修改文件）</label>',
+      '<label for="local-prompt">向 Codex 发送任务（权限以已连接会话为准）</label>',
       '<textarea id="local-prompt" placeholder="分析当前项目结构，并总结下一步应该完成的工作。" disabled></textarea>',
       '<div class="btn-row" style="margin-top:7px">',
       '<button id="local-send" disabled>▶ 执行任务</button>',
       '<button id="local-interrupt" disabled>■ 中断</button>',
+      '<button id="local-diff" disabled>⇄ 查看变更 Diff</button>',
       '</div></div>',
       '<div id="local-approvals"></div>',
       '<div class="local-caption">03 · Live Activity Stream</div>',
       '<div class="message-list" id="local-messages" aria-live="polite"></div>',
-      '<div class="local-footer">只读本机连接 · 模型由已登录的 Codex 决定 · 用户审批不能自动通过</div>',
+      '<div class="local-footer">本地回环连接 · 不上传到公开预览 · 网络沙箱限制 · 不自动批准命令</div>',
     '</div>'
   ].join('');
+  const diffModal=document.createElement('dialog');
+  diffModal.id='local-diff-modal';
+  diffModal.setAttribute('aria-label','Codex 文件修改差异');
+  diffModal.innerHTML='<header><strong>CODE DIFF · REAL CODEX</strong><button id="local-diff-close" type="button">× 关闭</button></header><div class="diff-legend">绿色：新增　红色：删除　蓝色：上下文</div><pre id="local-diff-text" aria-live="polite"></pre>';
+  document.body.appendChild(diffModal);
   document.body.appendChild(box);
 
   const $ = (id) => document.getElementById(id);
   const led = $('local-led');
   const stateText = $('local-state');
   const cwdField = $('local-cwd');
+  const modeSelect = $('local-mode');
+  const permissionText = $('local-permission');
+  const diffButton = $('local-diff');
+  const diffText = $('local-diff-text');
   const promptField = $('local-prompt');
   const connectButton = $('local-connect');
   const sendButton = $('local-send');
@@ -47,11 +63,30 @@
   let activeTurn = null;
   let currentAnswer = null;
   let source = null;
+  let sessionMode = 'readOnly';
+  let latestDiff = '';
+  let diffPanel = null;
+  let diffPanelTurnId = null;
 
   function status(message, connected = false) {
     stateText.textContent = message;
     led.classList.toggle('connected', connected);
   }
+  function modeName(value){return value==='workspaceWrite'?'工作区写入':'只读';}
+  function showSessionMode(value){
+    sessionMode=value==='workspaceWrite'?'workspaceWrite':'readOnly';
+    permissionText.textContent=sessionMode==='workspaceWrite'
+      ?'当前会话可修改所选项目；Codex 沙箱限制写入范围，联网默认关闭。请查看每次变更。'
+      :'只读模式：Codex 可以分析项目，不允许修改文件。';
+    permissionText.classList.toggle('write',sessionMode==='workspaceWrite');
+    status('Codex 已连接 · '+modeName(sessionMode),true);
+  }
+  modeSelect.addEventListener('change',()=>{
+    if(threadId)permissionText.textContent='切换选择将在重新创建会话时生效，当前会话仍为'+modeName(sessionMode)+'。';
+    else permissionText.textContent=modeSelect.value==='workspaceWrite'
+      ?'写入模式需额外确认；请只选择可信任的项目目录。'
+      :'只读模式：Codex 可以分析文件；修改能力关闭。';
+  });
 
   function add(text, cls = '') {
     const row = document.createElement('div');
@@ -79,7 +114,9 @@
       case 'commandExecution': return { kind:'command',icon:'›',title:'LIVE · COMMAND',
         line:Array.isArray(item.command)?item.command.join(' '):String(item.command||'Command'),w:242,h:158 };
       case 'fileChange': return { kind:'code',icon:'⌘',title:'LIVE · FILE CHANGE',
-        line:(item.changes||[]).map(c=>c.path).join('\n')||'Proposed file changes',w:240,h:166 };
+        line:(item.changes||[]).map(c=>
+          [c.kind||'change',c.path||'unknown',String(c.diff||'').slice(0,360)].filter(Boolean).join(' · ')
+        ).join('\n')||'Proposed file changes',w:250,h:178 };
       case 'agentMessage': return { kind:'analysis',icon:'◈',title:'GPT · RESPONSE',
         line:String(item.text||'Receiving response...'),w:228,h:140 };
       case 'plan': return {kind:'plan',icon:'▣',title:'LIVE · PLAN',
@@ -165,6 +202,7 @@
     }
     if (item.type === 'agentMessage' && item.text) add(item.text.slice(0,1400),'codex');
     if (item.type === 'commandExecution') add('命令完成 · '+(item.status||'unknown')+' · '+(item.exitCode??'—'),'codex');
+    if (item.type === 'fileChange') add('文件变更：'+(item.status||'unknown')+' · '+(item.changes?.length||0)+' 项','codex');
   }
 
   function approvalPrompt(event) {
@@ -176,8 +214,12 @@
     title.textContent='⚠ Codex 需要明确批准';
     const text=document.createElement('p');
     const p=event.params||{};
-    text.textContent=[p.reason||'请求执行操作',p.command||'',p.cwd||'']
-      .filter(Boolean).join('\n').slice(0,900);
+    text.textContent=[
+      p.reason||'请求执行操作',
+      event.method==='item/fileChange/requestApproval'?'请求修改文件':'请求运行命令',
+      p.command||'',p.cwd||'',p.grantRoot?('授权根目录：'+p.grantRoot):'',
+      p.networkApprovalContext?('联网目标：'+JSON.stringify(p.networkApprovalContext).slice(0,300)):''
+    ].filter(Boolean).join('\n').slice(0,1200);
     const buttons=document.createElement('div');
     buttons.className='btn-row';
     const yes=document.createElement('button');yes.textContent='允许本次';
@@ -205,7 +247,8 @@
     if (value.type === 'state') {
       if(value.threadId) {
         threadId=value.threadId;cwdField.value=value.cwd||cwdField.value;
-        status('Codex 已连接 · 只读',true);
+        showSessionMode(value.sessionMode);
+        modeSelect.value=sessionMode;
         promptField.disabled=false;
         setTurn(value.turnId);
       }
@@ -232,6 +275,33 @@
       if(!currentAnswer||!currentAnswer.isConnected)currentAnswer=add('GPT: ','codex');
       currentAnswer.textContent=(currentAnswer.textContent+delta).slice(-5000);
       messages.scrollTop=messages.scrollHeight;
+    }else if(method==='turn/diff/updated'){
+      const diff=typeof p.diff==='string'?p.diff:'';
+      latestDiff=diff.slice(0,25000);
+      diffButton.disabled=!latestDiff;
+      diffText.replaceChildren();
+      for(const line of latestDiff.split('\n')){
+        const span=document.createElement('span');
+        span.textContent=line+'\n';
+        span.className=line.startsWith('+')&&!line.startsWith('+++')?'added':
+          line.startsWith('-')&&!line.startsWith('---')?'removed':
+          line.startsWith('@@')?'hunk':line.startsWith('diff --git')?'file':'';
+        diffText.append(span);
+      }
+      const nextTurn=p.turnId||activeTurn||'unknown';
+      if(diffPanel&&diffPanelTurnId!==nextTurn){
+        window.NeonUI?.retire?.(diffPanel);diffPanel=null;
+      }
+      if(!diffPanel||!diffPanel.isConnected){
+        diffPanel=window.NeonUI?.spawn?.({
+          kind:'code',icon:'⇄',title:'LIVE · CODE DIFF',
+          live:'DIFF',w:250,h:175,
+          body:'<div class="tag">CHANGES</div>'
+        })||null;
+        diffPanelTurnId=nextTurn;
+      }
+      updatePanel(diffPanel,latestDiff.slice(-650));
+      add('收到代码差异更新 · '+latestDiff.length+' 字符','codex');
     }else if(method==='turn/started'){
       setTurn(p.turn?.id||'working');
       currentAnswer=null;
@@ -252,12 +322,23 @@
     connectButton.disabled=true;
     status('连接中…');
     try{
-      const res=await post('/api/session',{cwd:cwdField.value.trim()});
+      const cwd=cwdField.value.trim();
+      const requestedMode=modeSelect.value;
+      let writeConsent;
+      if(requestedMode==='workspaceWrite'){
+        const confirmed=window.confirm(
+          '允许 Codex 在以下项目内修改文件？\n\n'+cwd+
+          '\n\n这是有实际写入权限的本地会话，部分工作区内的文件操作可能不逐项弹出批准。请只选择受信任的项目并先备份代码。'
+        );
+        if(!confirmed){status('已取消写入授权',!!threadId);return;}
+        writeConsent='ALLOW_WORKSPACE_EDITS';
+      }
+      const res=await post('/api/session',{cwd,mode:requestedMode,confirmWorkspace:cwd,writeConsent});
       threadId=res.threadId;
       promptField.disabled=false;
       setTurn(null);
-      status('Codex 已连接 · 只读',true);
-      add('已连接 '+res.cwd,'codex');
+      showSessionMode(res.sessionMode);
+      add('已连接 '+res.cwd+' · '+modeName(sessionMode),'codex');
       connectButton.textContent='重新创建会话';
     }catch(err){
       add(err.message,'error');status('未连接');
@@ -280,6 +361,8 @@
     catch(err){add(err.message,'error');}
   };
 
+  diffButton.onclick=()=>{if(latestDiff)diffModal.showModal()};
+  $('local-diff-close').onclick=()=>diffModal.close();
   $('local-min').onclick=()=>{
     box.classList.toggle('minimized');
     $('local-min').textContent=box.classList.contains('minimized')?'＋':'−';
@@ -297,7 +380,8 @@
       if(info.cwd)cwdField.value=info.cwd;
       if(info.threadId){
         threadId=info.threadId;promptField.disabled=false;
-        status('Codex 已连接 · 只读',true);
+        showSessionMode(info.sessionMode);
+        modeSelect.value=sessionMode;
         setTurn(info.turnId);
       }
       window.NeonUI?.stop?.();
