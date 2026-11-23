@@ -1,8 +1,52 @@
-# Neon Core · Classic Glass v0.8
+# Neon Core · Classic Glass v0.9
 
 **Online preview:** https://supertms.github.io/neon-core/?v=0.8
 
 Neon Core is an experimental **16:9 holographic Codex workspace**. This public site is a visual demo with simulated task events; it does **not** access a user's Codex sessions or execute real commands.
+
+## v0.9 — Real Codex integration (localhost MVP)
+
+There are **two deliberately separate entry points**:
+
+1. **[Public visual demo](https://supertms.github.io/neon-core/)** — always simulated; safely accessible online, no secrets or shell access.
+2. **Local real Codex client** — serves the same holographic UI from the user's own machine and starts `codex app-server` using the official JSONL/stdio protocol. It never exposes that RPC service on a public host.
+
+### Windows quick start
+
+Requirements: Node.js **20+**, Git, and an up-to-date Codex CLI. If already installed, skip the install step.
+
+```powershell
+npm install -g @openai/codex@latest
+codex --version
+codex login
+git clone https://github.com/supertms/neon-core.git
+cd neon-core
+npm run local
+```
+
+Then open **http://127.0.0.1:4173/**. No `npm install` is required in this project; the local bridge uses Node's standard library.
+
+In the **LIVE CODEX · LOCAL** panel at upper right, enter the **absolute path** of the project you want Codex to inspect (for example `C:\\Projects\\my-app`), click **连接 Codex**, and type an instruction such as `分析这个项目的代码结构，指出最重要的三个潜在问题，不要修改文件`. Click **执行任务**. Code/command/agent events now drive the actual floating panels.
+
+If `codex login` is unavailable or authorization is expired, follow your current Codex CLI's sign-in flow, then restart the bridge. Authentication stays in Codex's local credential store; Neon Core never prompts you to paste an API key into a public page.
+
+### MVP features
+
+- Starts **Codex App Server** locally over stdio; one `initialize` → `initialized` handshake per process.
+- Creates a real `thread/start` with `sandbox: "read-only"` and `approvalPolicy: "on-request"`; runs `turn/start` on the selected project.
+- Subscribes to actual streamed `item/*`, `turn/*`, command output, and final response events through a local same-origin SSE stream.
+- Maps real events into the existing **Classic Glass** holographic panels and central cube pulse/recall choreography. User-controlled injection and mock demo remain available in the public preview.
+- Stops a running turn with **中断**.
+- Displays pending command/file-change approval requests and only responds after a **real user click** (or declines after a timeout); unknown request types are rejected.
+- Browser-to-localhost protection: binds **127.0.0.1** only, checks Host/Origin, rejects non-JSON mutations, requires a randomly generated local session token, does not enable permissive CORS, and never publishes bridge files to GitHub Pages.
+
+### Current boundaries
+
+**This is a source-complete but not yet Windows-verified real-connection MVP.** CI tests verify JSONL framing, the initialize handshake, manual approval behavior, static source isolation, and localhost token/origin security. A real end-to-end test against your installed CLI on Windows is still required before declaring it production-ready.
+
+The first session is **read-only**; Codex may execute tools for reading/analyzing, subject to its sandbox and approval policy, but cannot perform project edits in normal operation. Read-only is not a guarantee of strict per-directory read isolation; only select trusted working directories. Do not accept an approval you do not understand.
+
+The local real mode does not share authentication, conversations, or files with the public GitHub Pages preview. Next milestones: explicit workspace-write permissions, per-command approval UX, thread resume/history, and packaging as an independent Windows desktop application.
 
 ## v0.8 — Event-driven AI cube motion
 
