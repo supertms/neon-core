@@ -243,9 +243,10 @@ async function routes(req, res, url) {
     }
     const full = await realpath(cwd);
     if (!(await stat(full)).isDirectory()) return json(res, 400, { error: 'Not a directory.' });
-    if (requestedMode === 'workspaceWrite' && data.confirmWorkspace !== full) {
+    if (requestedMode === 'workspaceWrite' &&
+        (data.confirmWorkspace !== cwd || data.writeConsent !== 'ALLOW_WORKSPACE_EDITS')) {
       return json(res, 400, {
-        error: 'Write access requires an explicit confirmation matching the canonical project path.'
+        error: 'Write access requires the selected project path and explicit per-session consent.'
       });
     }
     connecting = true;
