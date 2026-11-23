@@ -60,24 +60,67 @@
 @media(max-width:1250px){.body{grid-template-columns:145px 1fr}.sidebar{padding:12px 8px}.brand{min-width:220px}.nav{gap:15px}.panel{transform:translate(-50%,-50%) rotateX(calc(var(--rx)*.8)) rotateY(calc(var(--ry)*.8)) rotateZ(var(--rz)) translateZ(var(--z)) scale(.86)}}
 @media(max-height:760px){.panel{scale:.85}.workbench{top:87%;height:120px}.core{top:45%;scale:.85}.platform{top:69%}}
 </style>
-<link rel="stylesheet" href="./assets/pixel-genesis.css?v=0.2">
-<link rel="stylesheet" href="./assets/panel-raster.css?v=0.5">
+<link rel="stylesheet" href="./assets/neon-classic.css?v=0.6">
 </head>
 <body>
 <div class="app">
-<header class="topbar"><div class="brand"><div class="logo"></div><div><strong>Codex Workspace</strong><small>NEON MATRIX · V0.5</small></div></div><nav class="nav"><span class="active">Build</span><span>Run</span><span>Debug</span><span>Analyze</span><span>Deploy</span></nav><div class="top-right"><span class="live"><i></i>DEMO MODE</span><span>⌕</span><span>♧</span><span>⚙</span><span>◉</span></div></header>
-<div class="body"><aside class="sidebar"><div class="workspace"><b>◇　Codex Core</b><small>●　12 agents ready</small></div><div class="side-title">WORKSPACE</div><div class="side-item active">◈　Overview</div><div class="side-item">◎　Tasks <em>24</em></div><div class="side-item">▱　Projects <em>8</em></div><div class="side-item">✓　Tests <em>36</em></div><div class="side-item">⌘　Code & Diff <em>14</em></div><div class="side-item">▷　Runs</div><div class="side-item">◇　Artifacts</div><div class="side-item">▤　Knowledge</div><div class="side-item">⚙　Settings</div><div class="side-bottom">RECENT WORKSPACES<br>◇　Codex Studio<br>◇　Inference Lab<br>◇　E2E Validation</div></aside>
+<header class="topbar"><div class="brand"><div class="logo"></div><div><strong>Codex</strong><small>Neon Core</small></div></div><div class="workspace-heading">Codex Workspace</div><nav class="nav"><span class="active">Build</span><span>Run</span><span>Debug</span><span>Analyze</span><span>Deploy</span></nav><div class="top-right"><span class="live"><i></i>DEMO MODE</span><span>⌕</span><span>♧</span><span>⚙</span><span>◉</span></div></header>
+<div class="body"><aside class="sidebar"><button class="new-demo" id="newDemo" title="Spawn simulated Codex task">＋　New Task</button><div class="side-item active">◈　Workspace</div><div class="side-item">◷　History</div><div class="side-item">▱　Projects</div><div class="side-item">◇　Models</div><div class="side-item">⚙　Settings</div><div class="side-bottom"><span style="color:#65d9c9">●</span>　DEMO MODE<br>Simulated task events<br>v0.6 · Classic Glass</div></aside>
 <main class="main"><section class="scene" id="scene"><div class="recursion"></div><div class="ring"></div><div class="core-beam"></div>
 <svg class="ribbons" viewBox="0 0 1200 700" preserveAspectRatio="none"><defs><linearGradient id="blue"><stop stop-color="#288dff" stop-opacity="0"/><stop offset=".5" stop-color="#36dfff" stop-opacity=".75"/><stop offset="1" stop-color="#8a68ff" stop-opacity="0"/></linearGradient></defs><path d="M-80 470 C170 300 260 590 480 430 S830 180 1030 300 S1260 470 1300 320" stroke="url(#blue)"/><path d="M-60 210 C190 90 300 310 510 235 S850 80 1010 185 S1240 340 1300 180" stroke="#8965ff"/></svg>
-<div class="core"><div class="core-halo"></div><div class="core-halo h2"></div><div class="core-halo h3"></div><div class="core-cube"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="core-orb"></div><div class="core-label">NEON CORE <small>AI ENGINE · ONLINE</small></div></div><div class="platform"></div>
+<div class="core core-prism" aria-label="Nested transparent holographic AI cube">
+<svg class="holo-cube" viewBox="0 0 320 330" role="img" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="prism-left" x1="0%" y1="0%" x2="100%" y2="95%"><stop stop-color="#1b9fdf" stop-opacity=".22"/><stop offset=".6" stop-color="#1067a8" stop-opacity=".08"/><stop offset="1" stop-color="#173d9b" stop-opacity=".18"/></linearGradient>
+  <linearGradient id="prism-right" x1="0%" y1="0%" x2="100%" y2="90%"><stop stop-color="#41e2ff" stop-opacity=".2"/><stop offset="1" stop-color="#0e57ba" stop-opacity=".13"/></linearGradient>
+  <linearGradient id="prism-top" x1="0%" y1="0%" x2="100%" y2="100%"><stop stop-color="#92dfff" stop-opacity=".12"/><stop offset=".5" stop-color="#298de1" stop-opacity=".03"/><stop offset="1" stop-color="#84c7ff" stop-opacity=".1"/></linearGradient>
+  <linearGradient id="prism-edge" x1="0%" y1="0%" x2="100%" y2="100%"><stop stop-color="#c3f7ff"/><stop offset=".45" stop-color="#3dcfff"/><stop offset="1" stop-color="#86b7ff"/></linearGradient>
+  <radialGradient id="prism-heart"><stop stop-color="#fff" stop-opacity="1"/><stop offset=".15" stop-color="#b7fbff" stop-opacity=".95"/><stop offset=".52" stop-color="#34d9ff" stop-opacity=".75"/><stop offset="1" stop-color="#168fe6" stop-opacity=".03"/></radialGradient>
+  <filter id="prism-blur" x="-120%" y="-120%" width="340%" height="340%"><feGaussianBlur stdDeviation="12"/></filter>
+  <filter id="prism-line-glow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.6"/></filter>
+</defs>
+<g class="prism-glow"><ellipse cx="160" cy="172" rx="70" ry="79" fill="#1dbeff" opacity=".17" filter="url(#prism-blur)"/></g>
+<g class="prism-outer">
+  <path d="M160 20 L288 95 L160 170 L32 95Z" fill="url(#prism-top)" stroke="#8fdefd" stroke-width="1.15" stroke-opacity=".8"/>
+  <path d="M32 95 L160 170 L160 312 L32 237Z" fill="url(#prism-left)" stroke="#71dcff" stroke-width="1.6"/>
+  <path d="M288 95 L160 170 L160 312 L288 237Z" fill="url(#prism-right)" stroke="#71dfff" stroke-width="1.6"/>
+  <path d="M160 20 L160 170 M32 95 L32 237 M288 95 L288 237 M32 237 L160 312 L288 237" fill="none" stroke="url(#prism-edge)" stroke-width="1.9"/>
+  <path d="M160 20 L288 95 L288 237 L160 312 L32 237 L32 95Z" fill="none" stroke="#35d5ff" stroke-width="6" stroke-opacity=".17" filter="url(#prism-line-glow)"/>
+  <path d="M160 46 L260 104 L160 162 L60 104Z M60 104 L60 227 L160 285 L260 227 L260 104 M160 162 L160 285" fill="none" stroke="#57cdff" stroke-width=".9" stroke-opacity=".37"/>
+  <path d="M160 73 L235 114 L160 156 L85 114Z M85 114 V218 L160 261 L235 218 V114 M160 156 V261" fill="none" stroke="#88e7ff" stroke-opacity=".4" stroke-width=".8"/>
+  <path d="M40 111 V137 M40 228 V212 M280 111 V137 M280 228 V212 M51 94 L77 80 M243 80 L269 94 M160 303 V281" fill="none" stroke="#bcf9ff" stroke-width="2.2" opacity=".84"/>
+</g>
+<g class="prism-middle">
+  <path d="M160 78 L252 130 L160 183 L68 130Z" fill="#3cbeff" fill-opacity=".065" stroke="#87ddff" stroke-opacity=".58" stroke-width="1.15"/>
+  <path d="M68 130 L160 183 L160 273 L68 220Z" fill="#31bcff" fill-opacity=".035" stroke="#6fd9ff" stroke-opacity=".6"/>
+  <path d="M252 130 L160 183 L160 273 L252 220Z" fill="#59dcff" fill-opacity=".06" stroke="#6fe0ff" stroke-opacity=".64"/>
+  <path d="M160 78 V183 M68 220 L160 273 L252 220" fill="none" stroke="#4cceff" stroke-width="1.2" opacity=".75"/>
+</g>
+<g class="prism-inner">
+  <path d="M160 110 L219 144 L160 178 L101 144Z" fill="#8beeff" fill-opacity=".3" stroke="#9cf2ff" stroke-width="1.6"/>
+  <path d="M101 144 L160 178 L160 249 L101 216Z" fill="#1f9ff3" fill-opacity=".38" stroke="#82e9ff" stroke-width="1.6"/>
+  <path d="M219 144 L160 178 L160 249 L219 216Z" fill="#3cd8ff" fill-opacity=".29" stroke="#86edff" stroke-width="1.6"/>
+  <path d="M160 110 V178 M101 216 L160 249 L219 216" fill="none" stroke="#d4ffff" stroke-width="1.5" stroke-opacity=".84"/>
+  <path d="M160 125 L205 151 L160 177 L115 151Z M115 151 V209 L160 235 L205 209 V151 M160 177 V235" fill="none" stroke="#a9faff" stroke-opacity=".32" stroke-width=".9"/>
+  <circle cx="160" cy="177" r="40" fill="url(#prism-heart)" opacity=".62"/>
+  <path d="M160 145 V209 M128 177 H192" stroke="#aafaff" stroke-opacity=".35"/>
+</g>
+<circle cx="160" cy="178" r="4" fill="#ebffff" class="prism-glow"/>
+<circle cx="160" cy="178" r="22" fill="url(#prism-heart)" opacity=".46" class="prism-glow"/>
+</svg></div><div class="platform"></div>
 <div class="panel-layer" id="panels"></div><div class="micro-layer" id="micros"></div>
 <div class="workbench hidden" id="workbench"><article class="deck"><h4>▣　TEST PLAN <b>LIVE</b></h4><p><b>✓</b> Unit tests (36)</p><p><b>✓</b> Integration tests (8)</p><p>○　E2E tests (3)</p><p>○　Coverage ≥ 90%</p></article><article class="deck"><h4>⌘　EXECUTION STREAM</h4><p>12:02:19　› scan --deep --project</p><p>12:02:26　› analyze --impact --tests</p><p><b>12:02:41　✓ plan.generate --e2e</b></p><p>12:03:04　› tests.build --unit</p></article><article class="deck"><h4>⌘　TASK FLOW</h4><p>PLAN　 →　 BUILD　 →　 TEST　 →　 VERIFY</p><div class="graph"><i style="--h:30%"></i><i style="--h:60%"></i><i style="--h:45%"></i><i style="--h:90%"></i><i style="--h:72%"></i><i style="--h:100%"></i></div></article></div>
-<div class="caption"><i></i><span id="sceneStatus">HOLOGRAPHIC WORKSPACE · STANDBY</span>　<span id="count">00 EVENTS</span></div><div class="controls"><button id="palette" class="palette-control" title="Change colors used while panels form">Color: Hybrid</button><label class="spawn-speed" for="spawnSpeed" title="Only pixel generation speed; does not affect task spawn cadence"><span>入场速度 <output id="spawnSpeedValue" for="spawnSpeed">0.50×</output></span><input id="spawnSpeed" type="range" min="0.25" max="2" value="0.5" step="0.25" aria-label="调整全息面板生成动画速度，0.25 倍到 2 倍"></label><button id="fxmode" class="fx-enabled" title="Toggle panel arrival animation">✦ FX: 6 Spawn Modes</button><button class="primary" id="play">▶ Start demo</button><button id="pause">Ⅱ Pause</button><button id="inject">＋ Inject event</button><button id="reset">↺ Reset</button></div>
+<div class="caption"><i></i><span id="sceneStatus">HOLOGRAPHIC WORKSPACE · STANDBY</span>　<span id="count">00 EVENTS</span></div><div class="controls"><button class="primary" id="play">▶ Start demo</button><button id="pause">Ⅱ Pause</button><button id="inject">＋ Inject event</button><button id="reset">↺ Reset</button></div>
 </section></main></div>
-<footer class="status"><span>●　Workspace: <strong>Codex Core</strong></span><span>⑂ main · a7f3e2c</span><span>✓ All systems operational</span><span class="metric">CPU　<b>24%</b></span><span class="metric">MEM　<b>38%</b></span><span class="metric">GPU　<b>12%</b></span><span>Agents 12/12</span></footer>
+<footer class="status" aria-label="模拟 AI 工作状态仪表板">
+  <article class="status-card"><h3>◇　AI Core</h3><div class="status-body"><div class="energy-arc"><svg viewBox="0 0 44 44" width="37" height="37" aria-hidden="true"><path d="M22 2 L40 12 V32 L22 42 L4 32 V12Z M4 12 L22 24 L40 12 M22 24 V42" stroke="#66eaff" stroke-width="1.4" fill="none"/></svg></div><div><div class="big">98%</div><div class="meter"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div></article>
+  <article class="status-card"><h3>☷　Task Progress</h3><div class="status-body" style="display:block"><div class="big">7 <span class="small">/ 12</span></div><div class="meter"><i ></i><i ></i><i ></i><i ></i><i ></i><i ></i><i ></i><i class="empty"></i><i class="empty"></i><i class="empty"></i><i class="empty"></i><i class="empty"></i></div></div></article>
+  <article class="status-card"><h3>⌁　Diagnostics</h3><div class="status-body"><div class="checks"><div>☑ Build <b>✓</b></div><div>☑ Tests <b>✓</b></div><div>☑ Lint <b>✓</b></div><div>☑ Type Check <b>✓</b></div></div><svg class="spark" viewBox="0 0 152 55" aria-hidden="true" preserveAspectRatio="none"><defs><linearGradient id="wave-fill" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4ddaff" stop-opacity=".24"/><stop offset="1" stop-color="#4ddaff" stop-opacity="0"/></linearGradient></defs><path d="M0 40 Q15 39 22 30 T42 30 T66 23 T92 27 T119 15 T152 20 L152 55 L0 55Z" fill="url(#wave-fill)"/><path d="M0 40 Q15 39 22 30 T42 30 T66 23 T92 27 T119 15 T152 20" fill="none" stroke="#4cdbff" stroke-width="1.5"/><path d="M0 52 Q20 44 33 48 T62 36 T98 39 T125 14 T152 22" fill="none" stroke="#a57eff" stroke-width="1.5"/></svg></div></article>
+  <article class="status-card"><h3>⚙　System</h3><div class="status-body"><div class="system-stats"><span>CPU</span><div class="track"><i style="width:41%"></i></div><span>41%</span><span>MEM</span><div class="track"><i style="width:57%"></i></div><span>57%</span><span>GPU</span><div class="track"><i style="width:36%"></i></div><span>36%</span></div></div></article>
+  <article class="status-card"><h3>⌁　Activity</h3><div class="status-body"><div class="bars"><i style="--hh:67%"></i><i style="--hh:39%"></i><i style="--hh:84%"></i><i style="--hh:30%"></i><i style="--hh:62%"></i><i style="--hh:36%"></i><i style="--hh:24%"></i><i style="--hh:34%"></i><i style="--hh:29%"></i><i style="--hh:72%"></i><i style="--hh:33%"></i><i style="--hh:79%"></i><i style="--hh:58%"></i><i style="--hh:51%"></i><i style="--hh:49%"></i><i style="--hh:22%"></i><i style="--hh:30%"></i><i style="--hh:28%"></i><i style="--hh:63%"></i><i style="--hh:59%"></i><i style="--hh:58%"></i><i style="--hh:78%"></i><i style="--hh:29%"></i><i style="--hh:57%"></i><i style="--hh:25%"></i><i style="--hh:24%"></i><i style="--hh:38%"></i><i style="--hh:44%"></i><i style="--hh:74%"></i><i style="--hh:28%"></i><i style="--hh:83%"></i><i style="--hh:39%"></i><i style="--hh:55%"></i><i style="--hh:36%"></i></div></div></article>
+</footer>
 </div>
-<script src="./assets/pixel-genesis.js?v=0.2"></script>
-<script src="./assets/panel-raster.js?v=0.5"></script>
+
 <script>
 const layer=document.getElementById('panels'),microLayer=document.getElementById('micros'),deck=document.getElementById('workbench'),status=document.getElementById('sceneStatus'),count=document.getElementById('count');
 const templates=[
@@ -109,9 +152,8 @@ function panel(t){
   p.className='panel entering';
   p.innerHTML='<div class="panel-head"><span class="icon">'+t.icon+'</span><b>'+t.title+'</b><span class="state">'+t.live+'</span></div><div class="panel-content">'+t.body+'</div>';
   layer.appendChild(p);
-  const pixelArrival=window.NeonPixel && window.NeonPixel.attachPanel(p,t.kind,event);
   active.push(p);
-  if(!pixelArrival)requestAnimationFrame(()=>requestAnimationFrame(()=>{
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
     if(!p.classList.contains('retreating')){p.classList.remove('entering');p.classList.add('active')}
   }));
   if(active.filter(x=>!x.classList.contains('retreating')).length>9){
@@ -121,9 +163,8 @@ function panel(t){
   if(!deckVisible){
     deck.classList.remove('hidden');
     deckVisible=true;
-    if(window.NeonPixel)window.NeonPixel.revealDeck(deck);
   }
-  status.textContent='LIVE TASK STREAM · '+t.title+(pixelArrival&&window.NeonPixel.getLastSpawnLabel?' · '+window.NeonPixel.getLastSpawnLabel():'');
+  status.textContent='LIVE · CLASSIC PANEL · '+t.title;
 }
 function micro(){
   const s=microSlots[microCursor++%microSlots.length];
@@ -137,18 +178,15 @@ function micro(){
   m.style.setProperty('--ry',s[5]+'deg');
   m.style.setProperty('--rz',s[6]+'deg');
   m.style.setProperty('--z',s[7]+'px');
-  const pixelArrival=window.NeonPixel && window.NeonPixel.attachMicro(m);
   microLayer.appendChild(m);micros.push(m);
-  if(!pixelArrival)requestAnimationFrame(()=>requestAnimationFrame(()=>m.classList.remove('entering')));
+  requestAnimationFrame(()=>requestAnimationFrame(()=>m.classList.remove('entering')));
   if(micros.filter(x=>!x.classList.contains('retreating')).length>13){
     retireMicro(micros.find(x=>!x.classList.contains('retreating')));
   }
 }
 function retire(p){
   if(!p||p.classList.contains('retreating'))return;
-  if(window.NeonPixel&&window.NeonPixel.cancelPanel)window.NeonPixel.cancelPanel(p);
-  p.classList.remove('active','materializing','variant-voxel','variant-scan','variant-slice','pixel-assembling','pixel-resolved');
-  p.querySelector('.genesis-vfx')?.remove();
+  p.classList.remove('active');
   p.classList.add('retreating');
   setTimeout(()=>{p.remove();active=active.filter(x=>x!==p)},1950);
 }
@@ -184,49 +222,7 @@ function reset(){
   document.getElementById('play').textContent='▶ Start demo';
 }
 document.getElementById('play').onclick=start;document.getElementById('pause').onclick=pause;document.getElementById('inject').onclick=inject;document.getElementById('reset').onclick=reset;
-const spawnSpeedInput=document.getElementById('spawnSpeed');
-const spawnSpeedValue=document.getElementById('spawnSpeedValue');
-function applySpawnSpeed(value,remember=false){
-  const speed=window.NeonPixel && window.NeonPixel.setSpawnSpeed
-    ? window.NeonPixel.setSpawnSpeed(value)
-    : Math.min(2,Math.max(.25,Number(value)||.5));
-  spawnSpeedInput.value=String(speed);
-  spawnSpeedValue.value=speed.toFixed(2)+'×';
-  spawnSpeedValue.textContent=spawnSpeedValue.value;
-  if(remember){
-    try{localStorage.setItem('neon-core.spawn-speed',String(speed))}catch(e){}
-  }
-}
-spawnSpeedInput.addEventListener('input',()=>applySpawnSpeed(spawnSpeedInput.value,true));
-try{
-  const saved=localStorage.getItem('neon-core.spawn-speed');
-  applySpawnSpeed(saved === null ? 0.5 : saved);
-}catch(e){applySpawnSpeed(.5)}
-const fxButton=document.getElementById('fxmode');
-let pixelFX=true;
-fxButton.onclick=()=>{
-  pixelFX=!pixelFX;
-  if(window.NeonPixel)window.NeonPixel.setEnabled(pixelFX);
-  fxButton.classList.toggle('fx-enabled',pixelFX);
-  fxButton.textContent=pixelFX?'✦ FX: 6 Spawn Modes':'◇ FX: Classic';
-  fxButton.title='Changes the next panels as they appear';
-};
-const paletteButton=document.getElementById('palette');
-const colorModes=['hybrid','neon','classic'];
-const colorLabels={hybrid:'Hybrid',neon:'Neon Matrix',classic:'Classic'};
-let colorMode='hybrid';
-paletteButton.onclick=()=>{
-  colorMode=colorModes[(colorModes.indexOf(colorMode)+1)%colorModes.length];
-  if(window.NeonPixel&&window.NeonPixel.setPalette)window.NeonPixel.setPalette(colorMode);
-  paletteButton.textContent='Color: '+colorLabels[colorMode];
-  paletteButton.title='Affects new panels only: Hybrid → Neon Matrix → Classic';
-};
-if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-  fxButton.disabled=true;
-  fxButton.classList.remove('fx-enabled');
-  fxButton.textContent='◇ Reduced motion';
-  fxButton.title='Your system requests reduced motion';
-}
+document.getElementById('newDemo').onclick=()=>{inject();};
 window.setTimeout(start,650);
 </script>
 </body>
