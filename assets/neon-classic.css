@@ -88,7 +88,12 @@
   border-color:rgba(69,159,206,.16);
   box-shadow:inset 0 0 70px rgba(24,139,179,.07)
 }
+@keyframes halo-respire {
+  0%,100% {opacity:.82;transform:translateX(-50%) rotateX(68deg) scale(1)}
+  50% {opacity:1;transform:translateX(-50%) rotateX(68deg) scale(1.016)}
+}
 .ring{
+  animation:halo-respire 7s ease-in-out infinite;
   top:5%;
   width:370px;height:98px;
   border-width:3px;
@@ -220,8 +225,8 @@
 .status-card .status-body{position:relative;display:flex;gap:12px;align-items:center}
 .status-card .big{font-weight:700;font-size:23px;color:#edfaff}
 .status-card .small{font-size:10px;color:#9cb5ce}
-.status-card .energy-arc{
-  flex:0 0 66px;width:66px;height:66px;border-radius:50%;
+ .status-card .energy-arc{
+  position:relative;flex:0 0 66px;width:66px;height:66px;border-radius:50%;
   display:grid;place-items:center;
   background:radial-gradient(circle,#1875a644 8%,transparent 58%),conic-gradient(#42e0ff 0 78%,rgba(48,166,224,.1) 78% 88%,#9e79ff 88% 93%,transparent 93%);
   box-shadow:0 0 11px rgba(48,197,252,.18)
@@ -279,4 +284,7 @@
 }
 @media(prefers-reduced-motion:reduce){
   .core-prism .holo-cube,.core-prism .prism-glow{animation:none!important}
+}
+@media(prefers-reduced-motion:reduce){
+  .ring,.ribbons path{animation:none!important}
 }
