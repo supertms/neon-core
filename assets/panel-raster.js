@@ -1,4 +1,4 @@
-/* Pixel Genesis v0.4 — pixels sampled from each panel's real DOM content.
+/* Pixel Genesis v0.5 — pixels sampled from each panel's real DOM content.
    The effect is a transition, not a texture on top of unrelated graphics. */
 (function(){
   'use strict';
@@ -189,6 +189,15 @@
   const snapshotCache=new Map();
   const lastModes=[];
   let paletteMode='hybrid';
+  // Speed is a multiplier of playback rate, not task-event frequency.
+  // 0.5x is the new default: the same formation takes twice as long.
+  let spawnSpeed=0.5;
+  function setSpawnSpeed(value){
+    const next=Number(value);
+    if(Number.isFinite(next))spawnSpeed=clamp(next,.25,2);
+    return spawnSpeed;
+  }
+  function getSpawnSpeed(){return spawnSpeed;}
   let lastMode='mosaic';
   let autoIndex=0;
 
@@ -410,15 +419,26 @@
     const chosenPalette=paletteMode;
     cachedSnapshot(panel,width,height).then(source=>{
       if(state.cancelled||!panel.isConnected)return;
-      let startTime=null;
+      let previousTime=null;
+      let elapsed=0;
+      let lastRendered=-Infinity;
       const cache=Object.create(null);
       function tick(now){
         if(state.cancelled||!panel.isConnected)return;
-        if(startTime===null)startTime=now;
-        const t=clamp((now-startTime)/duration);
+        if(previousTime===null)previousTime=now;
+        // Apply speed on every frame so adjustments also affect panels mid-formation.
+        // Cap long gaps (e.g. background tab) to avoid sudden completion.
+        const delta=Math.max(0,Math.min(100,now-previousTime));
+        previousTime=now;
+        elapsed+=delta*spawnSpeed;
+        const t=clamp(elapsed/duration);
         const alpha=t<.86?1:clamp((1-t)/.14);
-        ctx.clearRect(0,0,width,height);
-        if(alpha>0)drawCells(ctx,source,width,height,t,mode,sequence,cache,chosenPalette,alpha);
+        // The sample renderer is CPU-heavy; ~30 fps keeps simultaneous panels smooth.
+        if(now-lastRendered>=32||t===1){
+          lastRendered=now;
+          ctx.clearRect(0,0,width,height);
+          if(alpha>0)drawCells(ctx,source,width,height,t,mode,sequence,cache,chosenPalette,alpha);
+        }
         if(t>=.78){
           panel.classList.add('pixel-resolved');
           canvas.style.opacity=String(clamp((1-t)/.22));
@@ -438,5 +458,7 @@
   fx.getLastSpawnMode=()=>lastMode;
   fx.getLastSpawnLabel=()=>MODE_LABELS[lastMode];
   fx.getAvailableSpawnModes=()=>MODES.slice();
-  window.NeonPixelRasterVersion='0.4';
+  fx.setSpawnSpeed=setSpawnSpeed;
+  fx.getSpawnSpeed=getSpawnSpeed;
+  window.NeonPixelRasterVersion='0.5';
 })();
