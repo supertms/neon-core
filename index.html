@@ -177,6 +177,7 @@ function panel(t){
     deckVisible=true;
   }
   status.textContent='LIVE · CLASSIC PANEL · '+t.title;
+  return p;
 }
 function micro(){
   const s=microSlots[microCursor++%microSlots.length];
@@ -242,7 +243,9 @@ document.getElementById('coreRecall').onclick=()=>{
   if(candidate)retire(candidate);
   else status.textContent='没有待回收的面板 · 请先触发生成';
 };
-window.setTimeout(start,650);
+// Local bridge injects this flag only when served from localhost.
+window.NeonUI={spawn:panel,retire,stop:pause,start,reset};
+if(!window.__NEON_LOCAL_MODE__)window.setTimeout(start,650);
 </script>
 </body>
 </html>
