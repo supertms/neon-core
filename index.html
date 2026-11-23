@@ -61,7 +61,7 @@
 @media(max-height:760px){.panel{scale:.85}.workbench{top:87%;height:120px}.core{top:45%;scale:.85}.platform{top:69%}}
 </style>
 <link rel="stylesheet" href="./assets/pixel-genesis.css?v=0.2">
-<link rel="stylesheet" href="./assets/panel-raster.css?v=0.4">
+<link rel="stylesheet" href="./assets/panel-raster.css?v=0.5">
 </head>
 <body>
 <div class="app">
@@ -200,7 +200,7 @@ function applySpawnSpeed(value,remember=false){
 spawnSpeedInput.addEventListener('input',()=>applySpawnSpeed(spawnSpeedInput.value,true));
 try{
   const saved=localStorage.getItem('neon-core.spawn-speed');
-  applySpawnSpeed(saved===null?.5:saved);
+  applySpawnSpeed(saved === null ? 0.5 : saved);
 }catch(e){applySpawnSpeed(.5)}
 const fxButton=document.getElementById('fxmode');
 let pixelFX=true;
