@@ -15,6 +15,23 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  windows-smoke:
+    name: Windows bridge smoke test
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check bridge and UI syntax
+        run: |
+          node --check local/codex-rpc.mjs
+          node --check local/server.mjs
+          node --check assets/local-client.js
+      - name: Verify Windows localhost and token isolation
+        run: node --test local/codex-rpc.test.mjs local/bridge.test.mjs
+
   deploy:
     environment:
       name: github-pages
