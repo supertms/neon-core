@@ -1,8 +1,41 @@
-# Neon Core · Classic Glass v0.9
+# Neon Core · Classic Glass / Codex Integration v0.10
 
 **Online preview:** https://supertms.github.io/neon-core/?v=0.8
 
 Neon Core is an experimental **16:9 holographic Codex workspace**. This public site is a visual demo with simulated task events; it does **not** access a user's Codex sessions or execute real commands.
+
+## v0.10 — Real project edits, diff review and explicit permissions
+
+The first practical milestone beyond the read-only v0.9 connection is now implemented in the **local-only** client.
+
+### Working modes
+
+| Mode | What it permits | How to select |
+|---|---|---|
+| **Read-only (default)** | Analyze the project and run sandbox-constrained read tools without normal file edits | Select **只读分析** |
+| **Workspace write (opt-in)** | Modify files only in the selected project via Codex's workspace-write sandbox | Select **允许修改所选项目**, read the confirmation and approve |
+
+For write access, the browser presents a full-path confirmation and sends a separate per-session consent. The local server rejects unsupported modes (including `dangerFullAccess`) and will not switch projects or privileges during an active task.
+
+The server sends `thread/start.sandbox = "readOnly" | "workspaceWrite"`. Every `turn/start` explicitly specifies the corresponding sandbox policy; workspace writes are constrained to the selected canonical folder with `networkAccess: false`, and approvals are `on-request`. Codex can still request approvals to go beyond the default sandbox; **no request is automatically accepted**.
+
+**Important:** `workspaceWrite` is permission to edit that project. Within its sandbox, Codex may make some changes **without a separate approval for each file**. Use a trusted repository, Git and backups; inspect the full diff before keeping changes. This is not an atomic "review all changes before applying" mechanism.
+
+### Real diff viewer and event mapping
+
+When Codex emits `turn/diff/updated`, the local UI creates/updates a **LIVE · CODE DIFF** holographic panel, and **⇄ 查看变更 Diff** opens a scrollable unified diff with green additions, red deletions, and highlighted hunks. File-change items and pending command approvals stay in the event stream. Large diff/output events are clipped to safe display sizes instead of silently disappearing.
+
+The client continues to use the same **Classic Glass** panels and AI cube animations, now driven by real command/file/turn events.
+
+### One-click Windows launcher
+
+After cloning, double-click **`start-neon-core.cmd`** to launch the local bridge and open the browser at **http://127.0.0.1:4173/**. It requires Node.js 20+ and an installed/authenticated Codex CLI, but no app-specific `npm install`. Keep the command window open while using Neon Core.
+
+### Verification
+
+Linux CI tests cover a simulated Codex handshake, read-only turn, explicit write opt-in, diff stream and manual file approval (declined by default). A separate Windows CI job verifies the local server starts and protects the localhost API/token without needing an installed Codex CLI.
+
+**What remains unverified:** a real authenticated Codex App Server handshake on your own Windows PC, and actual patch application inside your chosen repository. This code is **not yet a production-ready desktop app**.
 
 ## v0.9 — Real Codex integration (localhost MVP)
 
