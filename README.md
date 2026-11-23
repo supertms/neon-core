@@ -2,7 +2,7 @@
 
 A dark, immersive 16:9 holographic interface prototype for Codex. The current online experience plays **simulated task events**; it does not yet connect to Codex App Server or execute real commands.
 
-**Live demo:** https://supertms.github.io/neon-core/?v=0.3
+**Live demo:** https://supertms.github.io/neon-core/?v=0.4
 
 ## Pixel Genesis v0.3 — content-matched reconstruction
 
@@ -31,6 +31,26 @@ Desktop browsers are recommended. The operating system's reduced-motion preferen
 - Center AI core remains in view; panels generate within the space rather than being fired out of it.
 - Lower horizontal workbench.
 - Panels return toward the core during their existing exit animation.
+
+
+## Neon Matrix v0.4 — richer pixels, varied assembly
+
+Building on v0.3’s DOM-matched raster snapshot, panel formation now has **six distinctive, content-shaped animations**:
+
+- **Pixel Mosaic** — saturated tiles appear in staggered blocks and subdivide.
+- **Scan Decode** — sweeping, high-contrast chromatic scan reveals the actual panel.
+- **Slice Assembly** — displaced horizontal slices align with their original pixel locations.
+- **Voxel Bloom** — panel-shaped voxels expand outward locally, then flatten into glass.
+- **Glitch Rebuild** — restrained, banded digital misalignment with violet/pink highlights.
+- **Node Lattice** — a glowing scaffold resolves into the panel’s own text, graph and borders.
+
+The engine favors modes that suit the panel content but avoids repeating either of the last two modes. Timing varies slightly. **The animation pixels still originate from the actual rendered panel**, so command text, red/green diff lines and status icons end up in the right place.
+
+The default **Color: Hybrid** setting features bright electric cyan, cobalt, violet, magenta, rose, orchid, orange and small gold highlights while constructing a panel, then returns to a readable deep-navy holographic screen. Click **Color: Hybrid** to cycle to **Neon Matrix** (more saturated) or **Classic** (more restrained). The palette setting affects newly spawned panels only.
+
+Controls: **FX: 6 Spawn Modes** toggles the animation vs classic entrance; **Inject event** creates a new panel; **Pause/Reset** manage the demo loop. The status caption names the last chosen spawn mode.
+
+The interface remains optimized for a 16:9 desktop viewport with a protected central AI core and layered workbench. All task data in this preview remains simulated.
 
 ## Source and delivery
 
