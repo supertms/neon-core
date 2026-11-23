@@ -29,7 +29,8 @@ jobs:
       - name: Validate source scripts and assets
         run: |
           node --check assets/pixel-genesis.js
-          node -e 'const fs=require("fs");const html=fs.readFileSync("index.html","utf8");new Function(html.split("<script>").pop().split("</script>")[0]);["assets/pixel-genesis.css","assets/pixel-genesis.js"].forEach(p=>{if(!fs.existsSync(p))throw Error("Missing "+p)});if(!html.includes("id=\"fxmode\""))throw Error("Missing FX switch");console.log("Neon Core source checks passed")'
+          node --check assets/panel-raster.js
+          node -e 'const fs=require("fs");const html=fs.readFileSync("index.html","utf8");new Function(html.split("<script>").pop().split("</script>")[0]);["assets/pixel-genesis.css","assets/pixel-genesis.js","assets/panel-raster.css","assets/panel-raster.js"].forEach(p=>{if(!fs.existsSync(p))throw Error("Missing "+p)});if(!html.includes("id=\"fxmode\""))throw Error("Missing FX switch");if(!html.includes("layer.appendChild(p);\n  const pixelArrival"))throw Error("Panel rasterization requires mounted DOM");console.log("Neon Core raster source checks passed")'
       - name: Prepare static site
         run: |
           mkdir -p _site
