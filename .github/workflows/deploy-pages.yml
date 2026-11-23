@@ -32,6 +32,7 @@ jobs:
           const fs=require('fs');
           const html=fs.readFileSync('index.html','utf8');
           const css=fs.readFileSync('assets/neon-classic.css','utf8');
+          const rims=fs.readFileSync('assets/neon-rims.css','utf8');
           const scripts=html.match(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)||[];
           for(const script of scripts) {
             const code=script.replace(/^<script(?:\s[^>]*)?>/,'').replace(/<\/script>$/,'');
@@ -42,6 +43,8 @@ jobs:
           }
           if(html.includes('NeonPixel')||html.includes('panel-raster.js'))throw new Error('Pixel FX must be removed from Classic Glass preview');
           if(!css.includes('.panel{')||!css.includes('.status-card'))throw new Error('Missing classic glass CSS');
+          if(!rims.includes('.panel.volumetric::before')||!rims.includes('.status-card::after')||!rims.includes('.panel.volumetric::after'))throw new Error('Missing multilayer and gradient glass rim rules');
+          if(!html.includes('neon-rims.css?v=0.7')||!html.includes("' volumetric'"))throw new Error('New glass frame stylesheet or panel binding is missing');
           console.log('Classic Glass scene checks passed');
           NODE
       - name: Prepare static site
@@ -49,6 +52,7 @@ jobs:
           mkdir -p _site/assets
           cp index.html _site/index.html
           cp assets/neon-classic.css _site/assets/neon-classic.css
+          cp assets/neon-rims.css _site/assets/neon-rims.css
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
