@@ -1,4 +1,4 @@
-/* Pixel Genesis v0.3 — pixels sampled from each panel's real DOM content.
+/* Pixel Genesis v0.4 — pixels sampled from each panel's real DOM content.
    The effect is a transition, not a texture on top of unrelated graphics. */
 (function(){
   'use strict';
@@ -156,51 +156,223 @@
     });
   }
 
+  // Six genuinely different reveal geometries, with type preference and anti-repeat.
+  const MODES=['mosaic','scan','slice','voxel','glitch','lattice'];
+  const MODE_LABELS={
+    mosaic:'Pixel Mosaic',
+    scan:'Scan Decode',
+    slice:'Slice Assembly',
+    voxel:'Voxel Bloom',
+    glitch:'Glitch Rebuild',
+    lattice:'Node Lattice'
+  };
+  const PREFERRED={
+    task:['mosaic','lattice','scan'],
+    command:['scan','glitch','slice'],
+    code:['slice','mosaic','glitch'],
+    files:['slice','voxel','mosaic'],
+    test:['mosaic','lattice','scan'],
+    analysis:['lattice','voxel','slice'],
+    plan:['lattice','slice','mosaic'],
+    metrics:['scan','voxel','glitch']
+  };
+  const NEON=[
+    [57,231,255],  // electric cyan
+    [58,141,255],  // vivid blue
+    [143,99,255],  // violet
+    [255,79,216], // pink
+    [255,90,139], // rose
+    [216,107,255],// orchid
+    [255,122,79], // ember
+    [255,198,109] // gold
+  ];
+  const snapshotCache=new Map();
+  const lastModes=[];
+  let paletteMode='hybrid';
+  let lastMode='mosaic';
+  let autoIndex=0;
+
   function hash(x,y,seed){
     let v=(x*374761393+y*668265263+seed*2147483647)|0;
     v=Math.imul(v^(v>>>13),1274126177);
     return ((v^(v>>>16))>>>0)/4294967295;
   }
-
-  function renderPixels(ctx,source,width,height,progress,kind,seed,cache){
-    ctx.clearRect(0,0,width,height);
-    const unit=progress<.26?14:progress<.52?9:progress<.72?5:progress<.88?3:1;
-    let data=cache[unit];
-    if(!data){
-      const cols=Math.ceil(width/unit),rows=Math.ceil(height/unit);
-      const temp=document.createElement('canvas');
-      temp.width=cols;temp.height=rows;
-      const t=temp.getContext('2d',{willReadFrequently:true});
-      t.imageSmoothingEnabled=true;
-      t.drawImage(source,0,0,cols,rows);
-      data={cols,rows,pixels:t.getImageData(0,0,cols,rows).data};
-      cache[unit]=data;
+  function clamp(v,min=0,max=1){return Math.max(min,Math.min(max,v));}
+  function chooseMode(kind){
+    autoIndex++;
+    let choices=(PREFERRED[kind]||MODES).filter(m=>!lastModes.includes(m));
+    // Every fourth spawn draws from the entire library to avoid type monotony.
+    if(autoIndex%4===0){
+      const wide=MODES.filter(m=>!lastModes.includes(m));
+      if(wide.length)choices=wide;
     }
-    const {cols,rows,pixels}=data;
-    const reveal=Math.min(1,progress/.83);
-    const pulse=progress<.30?1.16:1;
+    if(!choices.length)choices=MODES.filter(m=>m!==lastModes[lastModes.length-1]);
+    const mode=choices[Math.floor(Math.random()*choices.length)];
+    lastModes.push(mode);
+    if(lastModes.length>2)lastModes.shift();
+    lastMode=mode;
+    return mode;
+  }
+  function setPalette(mode){
+    if(['classic','neon','hybrid'].includes(mode))paletteMode=mode;
+    return paletteMode;
+  }
+  function getPalette(){return paletteMode;}
+  function cachedSnapshot(panel,width,height){
+    // Repeated demo panels have the same actual DOM; reuse the exact capture.
+    const key=width+'x'+height+':'+panel.innerHTML;
+    if(snapshotCache.has(key))return snapshotCache.get(key);
+    const promise=snapshot(panel,width,height).catch(e=>{
+      snapshotCache.delete(key);throw e;
+    });
+    snapshotCache.set(key,promise);
+    if(snapshotCache.size>18)snapshotCache.delete(snapshotCache.keys().next().value);
+    return promise;
+  }
+
+  function cellsFor(source,width,height,unit,cache,seed){
+    let cells=cache[unit];
+    if(cells)return cells;
+    const cols=Math.ceil(width/unit), rows=Math.ceil(height/unit);
+    const temp=document.createElement('canvas');
+    temp.width=cols;temp.height=rows;
+    const ctx=temp.getContext('2d',{willReadFrequently:true});
+    if(!ctx)return {cols,rows,rgba:new Uint8ClampedArray(cols*rows*4)};
+    ctx.imageSmoothingEnabled=true;
+    ctx.drawImage(source,0,0,cols,rows);
+    cells={cols,rows,rgba:ctx.getImageData(0,0,cols,rows).data};
+    cache[unit]=cells;
+    return cells;
+  }
+  function revealRank(mode,x,y,cols,rows,seed){
+    const nx=x/Math.max(1,cols-1),ny=y/Math.max(1,rows-1);
+    const jitter=hash(x,y,seed);
+    switch(mode){
+      case 'mosaic':
+        return .06+.75*jitter+.10*Math.abs(nx-.5);
+      case 'scan':
+        return .09+(.36*ny+.31*nx)+.15*jitter;
+      case 'slice':
+        return .04+.17*(Math.floor(y/Math.max(1,Math.ceil(rows/7)))%4)
+            +.22*nx+.13*jitter;
+      case 'voxel':{
+        const cx=.47+.2*(hash(seed,3,9)-.5);
+        const cy=.51+.24*(hash(seed,7,21)-.5);
+        return .06+.58*Math.hypot((nx-cx)*1.1,(ny-cy)*1.35)+.12*jitter;
+      }
+      case 'glitch':
+        return .05+.16*(Math.floor(y/Math.max(1,Math.ceil(rows/9)))%4)
+            +.54*jitter;
+      case 'lattice':{
+        const grid=Math.min(nx%(.15),ny%(.16));
+        return .06+(grid<.035?.12:.42)+.30*jitter;
+      }
+      default:return jitter*.8;
+    }
+  }
+  function paletteFor(x,y,seed){
+    // Smooth clusters of saturated color, not frame-to-frame random RGB noise.
+    const tileX=Math.floor(x/3),tileY=Math.floor(y/3);
+    const i=Math.floor(hash(tileX,tileY,seed)*NEON.length);
+    return NEON[i];
+  }
+  function pixelColor(sr,sg,sb,x,y,seed,progress,pal){
+    const bright=Math.max(sr,sg,sb);
+    const tint=paletteFor(x,y,seed);
+    let paletteStrength=pal==='classic'?.05:pal==='neon'?.96:.78;
+    paletteStrength*=1-.94*clamp((progress-.57)/.38);
+    // Preserve the semantics of red deleted lines and green test results.
+    if(sg>sr*1.26&&sg>sb*.87&&sg>75){
+      paletteStrength*=.28;
+    }else if(sr>sg*1.25&&sr>sb*.85&&sr>80){
+      paletteStrength*=.34;
+    }
+    // Dark glass regions get luminous pixel tiles rather than an all-black mosaic.
+    const shadow=bright<58;
+    const base=shadow
+      ?(pal==='classic'?[13,43,61]:[33,39,72])
+      :[Math.min(255,sr*1.18+11),Math.min(255,sg*1.18+9),Math.min(255,sb*1.18+11)];
+    const intensity=shadow?(pal==='neon'?.77:pal==='hybrid'?.59:.15):1;
+    const w=paletteStrength*intensity;
+    const r=Math.round(base[0]*(1-w)+tint[0]*w);
+    const g=Math.round(base[1]*(1-w)+tint[1]*w);
+    const b=Math.round(base[2]*(1-w)+tint[2]*w);
+    return [r,g,b];
+  }
+  function drawCells(ctx,source,width,height,progress,mode,seed,cache,palette,alpha){
+    const unit=progress<.25?16:progress<.48?11:progress<.70?7:progress<.86?4:2;
+    const {cols,rows,rgba}=cellsFor(source,width,height,unit,cache,seed);
+    const reach=clamp(progress/.84);
+    const shiftEnergy=clamp((.80-progress)/.80);
+    const flash=mode==='glitch'&&progress<.64?(.86+.14*Math.sin(progress*58)):1;
     for(let y=0;y<rows;y++){
       for(let x=0;x<cols;x++){
-        const i=(y*cols+x)*4;
-        const a=pixels[i+3];
-        if(a<22){continue;}
-        const r=pixels[i],g=pixels[i+1],b=pixels[i+2];
-        const intensity=Math.max(r,g,b);
-        // Coordinate order is driven by the actual panel position and task type.
-        // Randomness only changes *when* a real source pixel appears, not its color or location.
-        let sweep;
-        if(kind==='command'||kind==='task'){sweep=y/Math.max(1,rows-1);}
-        else if(kind==='code'||kind==='files'){sweep=x/Math.max(1,cols-1);}
-        else if(kind==='test'){sweep=(x/cols+y/rows)/2;}
-        else{sweep=Math.abs(x/cols-.5)*.4+y/rows*.6;}
-        const brightBoost=intensity>115?-.13:intensity>65?-.04:.13;
-        const rank=Math.max(0,Math.min(.92,hash(x,y,seed)*.49+sweep*.38+brightBoost));
-        if(reveal<rank){continue;}
-        const alpha=(a/255)*Math.min(1,(reveal-rank)*10+.25);
-        const glow=intensity>115&&progress<.72;
-        ctx.fillStyle='rgba('+Math.min(255,Math.round(r*pulse+(glow?10:0)))+','+Math.min(255,Math.round(g*pulse+(glow?8:0)))+','+Math.min(255,Math.round(b*pulse+(glow?10:0)))+','+alpha.toFixed(3)+')';
-        ctx.fillRect(x*unit,y*unit,Math.min(unit,width-x*unit),Math.min(unit,height-y*unit));
+        const offset=(y*cols+x)*4;
+        const a=rgba[offset+3];
+        if(a<18)continue;
+        const rank=revealRank(mode,x,y,cols,rows,seed);
+        if(reach<rank)continue;
+        const [sr,sg,sb]=[rgba[offset],rgba[offset+1],rgba[offset+2]];
+        const lum=Math.max(sr,sg,sb);
+        const h=hash(x,y,seed+19);
+        const lit=lum>70||h>.82;
+        const color=pixelColor(sr,sg,sb,x,y,seed,progress,palette);
+        const localFade=clamp((reach-rank)*11+.08);
+        const opacity=(a/255)*localFade*alpha*flash*(lum<58?.83:1);
+        let px=x*unit,py=y*unit;
+        let offsetX=0,offsetY=0;
+        if(mode==='slice'){
+          const band=Math.floor(y/Math.max(1,Math.ceil(rows/7)));
+          offsetX=(band%2?-1:1)*(10+band%3*4)*shiftEnergy;
+        }else if(mode==='glitch'){
+          const band=Math.floor(y/Math.max(1,Math.ceil(rows/9)));
+          offsetX=(band%3-1)*(5+12*h)*shiftEnergy;
+        }else if(mode==='voxel'){
+          offsetX=(x-cols/2)/cols*9*shiftEnergy;
+          offsetY=(y-rows/2)/rows*9*shiftEnergy;
+        }
+        px+=offsetX;py+=offsetY;
+        const r=color[0],g=color[1],b=color[2];
+        ctx.fillStyle='rgba('+r+','+g+','+b+','+opacity.toFixed(3)+')';
+        const size=mode==='voxel'&&progress<.58?unit*1.06:unit;
+        if(mode==='voxel'&&lit&&progress<.66&&unit>=7){
+          ctx.fillStyle='rgba(133,80,255,'+(opacity*.29).toFixed(3)+')';
+          ctx.fillRect(px+3,py-3,size,size);
+          ctx.fillStyle='rgba('+r+','+g+','+b+','+opacity.toFixed(3)+')';
+        }
+        if(mode==='lattice'&&progress<.56&&lit&&unit>=7){
+          ctx.strokeStyle='rgba(255,96,225,'+(opacity*.76).toFixed(3)+')';
+          ctx.lineWidth=.8;ctx.strokeRect(px+.5,py+.5,Math.max(1,size-1),Math.max(1,size-1));
+        }
+        ctx.fillRect(px,py,size,size);
+        if(mode==='mosaic'&&progress<.47&&lit&&unit>=9){
+          ctx.fillStyle='rgba(245,155,255,'+(opacity*.22).toFixed(3)+')';
+          ctx.fillRect(px+1,py+1,Math.max(1,size-2),Math.max(1,size-2));
+        }
       }
+    }
+    if(mode==='scan'){
+      const scanY=height*(progress*1.25-.18);
+      const grad=ctx.createLinearGradient(0,scanY-20,0,scanY+13);
+      grad.addColorStop(0,'rgba(55,229,255,0)');
+      grad.addColorStop(.46,'rgba(255,83,223,.24)');
+      grad.addColorStop(.65,'rgba(255,166,102,.38)');
+      grad.addColorStop(1,'rgba(55,229,255,0)');
+      ctx.fillStyle=grad;ctx.fillRect(0,scanY-20,width,33);
+    }
+    if(mode==='glitch'&&progress<.70){
+      const yy=(Math.floor(progress*13)*17+seed*7)%height;
+      ctx.fillStyle='rgba(255,72,215,.25)';
+      ctx.fillRect(0,yy,width*.45,2);
+      ctx.fillStyle='rgba(55,229,255,.36)';
+      ctx.fillRect(width*.36,yy+4,width*.45,1);
+    }
+    if(mode==='lattice'&&progress<.56){
+      ctx.strokeStyle='rgba(119,92,255,.22)';
+      ctx.lineWidth=.7;
+      const step=unit*5;
+      for(let x=step;x<width;x+=step){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,height);ctx.stroke();}
+      for(let y=step;y<height;y+=step){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(width,y);ctx.stroke();}
     }
   }
 
@@ -219,31 +391,37 @@
   function attachPanel(panel,kind,sequence){
     if(!fx.enabled()||(reduced&&reduced.matches)){return false;}
     const width=Math.round(panel.offsetWidth),height=Math.round(panel.offsetHeight);
-    if(!width||!height){return false;}
+    if(!width||!height)return false;
+    const mode=chooseMode(kind);
+    panel.dataset.spawnMode=mode;
     panel.classList.remove('entering','active');
     panel.classList.add('pixel-assembling');
-    const surface=document.createElement('canvas');
-    surface.width=width;surface.height=height;
-    surface.className='panel-pixel-canvas';
-    surface.setAttribute('aria-hidden','true');
-    panel.appendChild(surface);
-    const state={canvas:surface,cancelled:false,frame:0};
+    const canvas=document.createElement('canvas');
+    canvas.width=width;canvas.height=height;
+    canvas.className='panel-pixel-canvas';
+    canvas.setAttribute('aria-hidden','true');
+    panel.appendChild(canvas);
+    const ctx=canvas.getContext('2d',{alpha:true});
+    if(!ctx){canvas.remove();panel.classList.remove('pixel-assembling');return false;}
+    const state={canvas,cancelled:false,frame:0};
     running.set(panel,state);
-    const ctx=surface.getContext('2d',{alpha:true,willReadFrequently:false});
-    if(!ctx){cancelPanel(panel);return false;}
-    const duration=kind==='code'?1040:kind==='command'?880:kind==='test'?940:980;
-    snapshot(panel,width,height).then(source=>{
-      if(state.cancelled||!panel.isConnected){return;}
+    const durations={mosaic:1030,scan:960,slice:1100,voxel:1160,glitch:920,lattice:1070};
+    const duration=durations[mode]+Math.floor(hash(sequence,kind.length,18)*130);
+    const chosenPalette=paletteMode;
+    cachedSnapshot(panel,width,height).then(source=>{
+      if(state.cancelled||!panel.isConnected)return;
       let startTime=null;
       const cache=Object.create(null);
       function tick(now){
-        if(state.cancelled||!panel.isConnected){return;}
-        if(startTime===null){startTime=now;}
-        const t=Math.min(1,(now-startTime)/duration);
-        renderPixels(ctx,source,width,height,t,kind,sequence,cache);
+        if(state.cancelled||!panel.isConnected)return;
+        if(startTime===null)startTime=now;
+        const t=clamp((now-startTime)/duration);
+        const alpha=t<.86?1:clamp((1-t)/.14);
+        ctx.clearRect(0,0,width,height);
+        if(alpha>0)drawCells(ctx,source,width,height,t,mode,sequence,cache,chosenPalette,alpha);
         if(t>=.78){
           panel.classList.add('pixel-resolved');
-          surface.style.opacity=String(Math.max(0,1-(t-.78)/.22));
+          canvas.style.opacity=String(clamp((1-t)/.22));
         }
         if(t<1){state.frame=requestAnimationFrame(tick);}
         else{cancelPanel(panel);}
@@ -255,5 +433,10 @@
 
   fx.attachPanel=attachPanel;
   fx.cancelPanel=cancelPanel;
-  window.NeonPixelRasterVersion='0.3';
+  fx.setPalette=setPalette;
+  fx.getPalette=getPalette;
+  fx.getLastSpawnMode=()=>lastMode;
+  fx.getLastSpawnLabel=()=>MODE_LABELS[lastMode];
+  fx.getAvailableSpawnModes=()=>MODES.slice();
+  window.NeonPixelRasterVersion='0.4';
 })();
