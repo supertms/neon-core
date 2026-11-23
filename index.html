@@ -65,19 +65,19 @@
 </head>
 <body>
 <div class="app">
-<header class="topbar"><div class="brand"><div class="logo"></div><div><strong>Codex Workspace</strong><small>NEON MATRIX · V0.4</small></div></div><nav class="nav"><span class="active">Build</span><span>Run</span><span>Debug</span><span>Analyze</span><span>Deploy</span></nav><div class="top-right"><span class="live"><i></i>DEMO MODE</span><span>⌕</span><span>♧</span><span>⚙</span><span>◉</span></div></header>
+<header class="topbar"><div class="brand"><div class="logo"></div><div><strong>Codex Workspace</strong><small>NEON MATRIX · V0.5</small></div></div><nav class="nav"><span class="active">Build</span><span>Run</span><span>Debug</span><span>Analyze</span><span>Deploy</span></nav><div class="top-right"><span class="live"><i></i>DEMO MODE</span><span>⌕</span><span>♧</span><span>⚙</span><span>◉</span></div></header>
 <div class="body"><aside class="sidebar"><div class="workspace"><b>◇　Codex Core</b><small>●　12 agents ready</small></div><div class="side-title">WORKSPACE</div><div class="side-item active">◈　Overview</div><div class="side-item">◎　Tasks <em>24</em></div><div class="side-item">▱　Projects <em>8</em></div><div class="side-item">✓　Tests <em>36</em></div><div class="side-item">⌘　Code & Diff <em>14</em></div><div class="side-item">▷　Runs</div><div class="side-item">◇　Artifacts</div><div class="side-item">▤　Knowledge</div><div class="side-item">⚙　Settings</div><div class="side-bottom">RECENT WORKSPACES<br>◇　Codex Studio<br>◇　Inference Lab<br>◇　E2E Validation</div></aside>
 <main class="main"><section class="scene" id="scene"><div class="recursion"></div><div class="ring"></div><div class="core-beam"></div>
 <svg class="ribbons" viewBox="0 0 1200 700" preserveAspectRatio="none"><defs><linearGradient id="blue"><stop stop-color="#288dff" stop-opacity="0"/><stop offset=".5" stop-color="#36dfff" stop-opacity=".75"/><stop offset="1" stop-color="#8a68ff" stop-opacity="0"/></linearGradient></defs><path d="M-80 470 C170 300 260 590 480 430 S830 180 1030 300 S1260 470 1300 320" stroke="url(#blue)"/><path d="M-60 210 C190 90 300 310 510 235 S850 80 1010 185 S1240 340 1300 180" stroke="#8965ff"/></svg>
 <div class="core"><div class="core-halo"></div><div class="core-halo h2"></div><div class="core-halo h3"></div><div class="core-cube"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="core-orb"></div><div class="core-label">NEON CORE <small>AI ENGINE · ONLINE</small></div></div><div class="platform"></div>
 <div class="panel-layer" id="panels"></div><div class="micro-layer" id="micros"></div>
 <div class="workbench hidden" id="workbench"><article class="deck"><h4>▣　TEST PLAN <b>LIVE</b></h4><p><b>✓</b> Unit tests (36)</p><p><b>✓</b> Integration tests (8)</p><p>○　E2E tests (3)</p><p>○　Coverage ≥ 90%</p></article><article class="deck"><h4>⌘　EXECUTION STREAM</h4><p>12:02:19　› scan --deep --project</p><p>12:02:26　› analyze --impact --tests</p><p><b>12:02:41　✓ plan.generate --e2e</b></p><p>12:03:04　› tests.build --unit</p></article><article class="deck"><h4>⌘　TASK FLOW</h4><p>PLAN　 →　 BUILD　 →　 TEST　 →　 VERIFY</p><div class="graph"><i style="--h:30%"></i><i style="--h:60%"></i><i style="--h:45%"></i><i style="--h:90%"></i><i style="--h:72%"></i><i style="--h:100%"></i></div></article></div>
-<div class="caption"><i></i><span id="sceneStatus">HOLOGRAPHIC WORKSPACE · STANDBY</span>　<span id="count">00 EVENTS</span></div><div class="controls"><button id="palette" class="palette-control" title="Change colors used while panels form">Color: Hybrid</button><button id="fxmode" class="fx-enabled" title="Toggle panel arrival animation">✦ FX: 6 Spawn Modes</button><button class="primary" id="play">▶ Start demo</button><button id="pause">Ⅱ Pause</button><button id="inject">＋ Inject event</button><button id="reset">↺ Reset</button></div>
+<div class="caption"><i></i><span id="sceneStatus">HOLOGRAPHIC WORKSPACE · STANDBY</span>　<span id="count">00 EVENTS</span></div><div class="controls"><button id="palette" class="palette-control" title="Change colors used while panels form">Color: Hybrid</button><label class="spawn-speed" for="spawnSpeed" title="Only pixel generation speed; does not affect task spawn cadence"><span>入场速度 <output id="spawnSpeedValue" for="spawnSpeed">0.50×</output></span><input id="spawnSpeed" type="range" min="0.25" max="2" value="0.5" step="0.25" aria-label="调整全息面板生成动画速度，0.25 倍到 2 倍"></label><button id="fxmode" class="fx-enabled" title="Toggle panel arrival animation">✦ FX: 6 Spawn Modes</button><button class="primary" id="play">▶ Start demo</button><button id="pause">Ⅱ Pause</button><button id="inject">＋ Inject event</button><button id="reset">↺ Reset</button></div>
 </section></main></div>
 <footer class="status"><span>●　Workspace: <strong>Codex Core</strong></span><span>⑂ main · a7f3e2c</span><span>✓ All systems operational</span><span class="metric">CPU　<b>24%</b></span><span class="metric">MEM　<b>38%</b></span><span class="metric">GPU　<b>12%</b></span><span>Agents 12/12</span></footer>
 </div>
 <script src="./assets/pixel-genesis.js?v=0.2"></script>
-<script src="./assets/panel-raster.js?v=0.4"></script>
+<script src="./assets/panel-raster.js?v=0.5"></script>
 <script>
 const layer=document.getElementById('panels'),microLayer=document.getElementById('micros'),deck=document.getElementById('workbench'),status=document.getElementById('sceneStatus'),count=document.getElementById('count');
 const templates=[
@@ -184,6 +184,24 @@ function reset(){
   document.getElementById('play').textContent='▶ Start demo';
 }
 document.getElementById('play').onclick=start;document.getElementById('pause').onclick=pause;document.getElementById('inject').onclick=inject;document.getElementById('reset').onclick=reset;
+const spawnSpeedInput=document.getElementById('spawnSpeed');
+const spawnSpeedValue=document.getElementById('spawnSpeedValue');
+function applySpawnSpeed(value,remember=false){
+  const speed=window.NeonPixel && window.NeonPixel.setSpawnSpeed
+    ? window.NeonPixel.setSpawnSpeed(value)
+    : Math.min(2,Math.max(.25,Number(value)||.5));
+  spawnSpeedInput.value=String(speed);
+  spawnSpeedValue.value=speed.toFixed(2)+'×';
+  spawnSpeedValue.textContent=spawnSpeedValue.value;
+  if(remember){
+    try{localStorage.setItem('neon-core.spawn-speed',String(speed))}catch(e){}
+  }
+}
+spawnSpeedInput.addEventListener('input',()=>applySpawnSpeed(spawnSpeedInput.value,true));
+try{
+  const saved=localStorage.getItem('neon-core.spawn-speed');
+  applySpawnSpeed(saved===null?.5:saved);
+}catch(e){applySpawnSpeed(.5)}
 const fxButton=document.getElementById('fxmode');
 let pixelFX=true;
 fxButton.onclick=()=>{
