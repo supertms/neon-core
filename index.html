@@ -61,6 +61,7 @@
 @media(max-height:760px){.panel{scale:.85}.workbench{top:87%;height:120px}.core{top:45%;scale:.85}.platform{top:69%}}
 </style>
 <link rel="stylesheet" href="./assets/neon-classic.css?v=0.6">
+<link rel="stylesheet" href="./assets/neon-rims.css?v=0.7">
 </head>
 <body>
 <div class="app">
@@ -149,7 +150,9 @@ function panel(t){
   p.style.setProperty('--ry',s.ry+'deg');
   p.style.setProperty('--rz',s.rz+'deg');
   p.style.setProperty('--z',s.z+'px');
-  p.className='panel entering';
+  // Larger work surfaces get the volumetric cyan rim; utility panels keep a
+  // narrow cyan-to-violet gradient outline for lower visual density.
+  p.className='panel entering'+(['task','code','files','command'].includes(t.kind)?' volumetric':'');
   p.innerHTML='<div class="panel-head"><span class="icon">'+t.icon+'</span><b>'+t.title+'</b><span class="state">'+t.live+'</span></div><div class="panel-content">'+t.body+'</div>';
   layer.appendChild(p);
   active.push(p);
