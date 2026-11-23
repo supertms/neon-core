@@ -26,10 +26,15 @@ jobs:
         uses: actions/configure-pages@v5
         with:
           enablement: true
+      - name: Validate source scripts and assets
+        run: |
+          node --check assets/pixel-genesis.js
+          node -e 'const fs=require("fs");const html=fs.readFileSync("index.html","utf8");new Function(html.split("<script>").pop().split("</script>")[0]);["assets/pixel-genesis.css","assets/pixel-genesis.js"].forEach(p=>{if(!fs.existsSync(p))throw Error("Missing "+p)});if(!html.includes("id=\"fxmode\""))throw Error("Missing FX switch");console.log("Neon Core source checks passed")'
       - name: Prepare static site
         run: |
           mkdir -p _site
           cp index.html _site/index.html
+          cp -R assets _site/assets
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
