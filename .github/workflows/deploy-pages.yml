@@ -28,6 +28,12 @@ jobs:
           enablement: true
       - name: Validate core motion script
         run: node --check assets/core-motion.js
+      - name: Validate local Codex integration
+        run: |
+          node --check local/codex-rpc.mjs
+          node --check local/server.mjs
+          node --check assets/local-client.js
+          node --test local/*.test.mjs
       - name: Validate classic scene and interface
         run: |
           node - <<'NODE'
