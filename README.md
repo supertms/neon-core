@@ -1,86 +1,45 @@
-# Neon Core
+# Neon Core · Classic Glass v0.6
 
-A dark, immersive 16:9 holographic interface prototype for Codex. The current online experience plays **simulated task events**; it does not yet connect to Codex App Server or execute real commands.
+**Online preview:** https://supertms.github.io/neon-core/?v=0.6
 
-**Live demo:** https://supertms.github.io/neon-core/?v=0.5
+Neon Core is an experimental **16:9 holographic Codex workspace**. This public site is a visual demo with simulated task events; it does **not** access a user's Codex sessions or execute real commands.
 
-## Pixel Genesis v0.3 — content-matched reconstruction
+## Design direction
 
-The former v0.2 animation scattered unrelated cyan/purple pixels over panels. v0.3 replaces that effect with a **rasterization of each actual task panel**:
+The new v0.6 returns to the restrained **Classic** entrance that felt better during review. The animated pixelization variants and their speed/palette controls are removed from the live interface.
 
-1. Render a clean offscreen clone of the specific panel, including its final layout, text, icons, code diff colors, checks, graphs, and border.
-2. Convert that picture into a temporary canvas; render pixel cells at the *same positions and colors* as the content.
-3. Gradually reconstruct the panel from 14px blocks to 9px, 5px, 3px and finally fine pixels, with each cell appearing according to a content-aware progression.
-4. Reveal the original accessible, interactive HTML panel as the generated image resolves to full fidelity.
-5. When finished, preserve the existing retreat / shrink / fade toward the core.
+The interface is now modeled after the approved reference concept:
 
-No separate random-colored decoration is placed over unrelated content. Variations only affect **when real pixels appear**: command panels scan vertically, code and file panels fill laterally, test panels progress across their contents.
+- **Central AI core:** a large translucent **nested holographic cube** with an inner luminous cube, multi-layer wireframes and a restrained cyan beam. No animated spherical energy core.
+- **Glass panel style:** beveled-looking cyan-to-violet gradient borders, soft rim glow, dark translucent glass surfaces and subtle reflections.
+- **Full layout:** a clear Codex / Codex Workspace header, sidebar with a New Task demo button, layered left/right/overhead panels, lower horizontal holographic workbench and **five wide status instruments** below.
+- **Motion:** classic soft unfold/fade; finished panels slowly shrink, retreat and fade toward the center, without covering the central cube.
+- **Density:** dynamically repeating simulated task events with up to nine primary panels plus smaller background panels; the central area is protected by composition and depth.
 
-The primary snapshot path uses built-in SVG `foreignObject` with computed DOM styles; a structural Canvas2D drawing of the panel's actual DOM serves as a fallback when a browser cannot draw the SVG. There is no CDN dependency.
+This is an editable CSS/SVG/HTML implementation, **not** the original concept image embedded as a static screenshot. Fidelity will be iterated on against desktop browser captures.
 
-### Try it
+## Demo interactions
 
-Use **FX: Raster Genesis / FX: Classic** at the bottom right of the online demo to switch the *next spawned panels* between pixel reconstruction and conventional entrances. **Inject event** spawns an additional panel for inspection; **Reset** returns to idle.
+- **Start demo:** resume the event feed.
+- **Pause:** stop new panel creation.
+- **Inject event:** manually spawn a panel to inspect the entry motion.
+- **Reset:** animate the existing panels back to the central area.
+- **New Task** (sidebar): add a simulated task panel.
 
-Desktop browsers are recommended. The operating system's reduced-motion preference disables complex animation. No real local code, repository secrets, or commands are exposed by this static site.
+## Source & deployment
 
-## What stays the same
+Only `index.html` and `assets/neon-classic.css` are required by the published preview. Legacy Pixel Genesis experiments remain available in Git history but are no longer loaded on the website.
 
-- 16:9 shell and deep-navy / ice-blue / restrained-purple styling.
-- Dense floating holographic panels with varied angles and depths.
-- Center AI core remains in view; panels generate within the space rather than being fired out of it.
-- Lower horizontal workbench.
-- Panels return toward the core during their existing exit animation.
+To run locally, serve the repository root:
 
-
-## v0.5 — Live panel materialization speed
-
-The **入场速度 (Generation speed)** slider in the lower-right control bar adjusts the **Pixel Genesis animation playback rate**, not the task event rate. The setting is saved locally for your next visit.
-
-| Speed | Typical arrival time |
-|---|---|
-| 0.25× | about 3.7–5 seconds |
-| **0.50× (default)** | **about 1.8–2.5 seconds** |
-| 0.75× | about 1.2–1.7 seconds |
-| 1.00× | about 0.9–1.3 seconds (v0.4 pace) |
-| 1.50× | about 0.6–0.9 seconds |
-| 2.00× | about 0.45–0.65 seconds |
-
-The slider affects animations **already in progress** on the next frame as well as future panels, so you can compare different speeds without restarting the demo. A light ~30 fps render throttle helps keep the content-driven pixel renderer responsive at low speeds and with overlapping panels. Choosing Classic FX bypasses the pixel speed control.
-
-Motion preferences take precedence: if the system requests reduced motion, complex pixel animations remain disabled.
-
-## Neon Matrix v0.4 — richer pixels, varied assembly
-
-Building on v0.3’s DOM-matched raster snapshot, panel formation now has **six distinctive, content-shaped animations**:
-
-- **Pixel Mosaic** — saturated tiles appear in staggered blocks and subdivide.
-- **Scan Decode** — sweeping, high-contrast chromatic scan reveals the actual panel.
-- **Slice Assembly** — displaced horizontal slices align with their original pixel locations.
-- **Voxel Bloom** — panel-shaped voxels expand outward locally, then flatten into glass.
-- **Glitch Rebuild** — restrained, banded digital misalignment with violet/pink highlights.
-- **Node Lattice** — a glowing scaffold resolves into the panel’s own text, graph and borders.
-
-The engine favors modes that suit the panel content but avoids repeating either of the last two modes. Timing varies slightly. **The animation pixels still originate from the actual rendered panel**, so command text, red/green diff lines and status icons end up in the right place.
-
-The default **Color: Hybrid** setting features bright electric cyan, cobalt, violet, magenta, rose, orchid, orange and small gold highlights while constructing a panel, then returns to a readable deep-navy holographic screen. Click **Color: Hybrid** to cycle to **Neon Matrix** (more saturated) or **Classic** (more restrained). The palette setting affects newly spawned panels only.
-
-Controls: **FX: 6 Spawn Modes** toggles the animation vs classic entrance; **Inject event** creates a new panel; **Pause/Reset** manage the demo loop. The status caption names the last chosen spawn mode.
-
-The interface remains optimized for a 16:9 desktop viewport with a protected central AI core and layered workbench. All task data in this preview remains simulated.
-
-## Source and delivery
-
-No dependency installation is required for the static demo. Serve the repository root:
-
-```bash
+```sh
 python -m http.server 4173
 ```
 
 Then open http://127.0.0.1:4173.
 
-Pushes to `main` trigger a GitHub Actions workflow that validates JavaScript syntax and deploys the HTML and asset files to GitHub Pages.
+Pushes to `main` trigger GitHub Actions syntax/structure checks and deploy the static preview to GitHub Pages.
 
-## Next
+## Future
 
-Iterate against actual browser feedback on pixel fidelity and motion cadence; then design a secure local/desktop bridge for real Codex App Server events.
+Next will be in-browser visual review and layout polish, followed by a secured local desktop bridge to Codex App Server (live task events and approvals). The demo dashboard numbers are illustrative and are not actual system metrics.
