@@ -26,6 +26,8 @@ jobs:
         uses: actions/configure-pages@v5
         with:
           enablement: true
+      - name: Validate core motion script
+        run: node --check assets/core-motion.js
       - name: Validate classic scene and interface
         run: |
           node - <<'NODE'
@@ -33,6 +35,7 @@ jobs:
           const html=fs.readFileSync('index.html','utf8');
           const css=fs.readFileSync('assets/neon-classic.css','utf8');
           const rims=fs.readFileSync('assets/neon-rims.css','utf8');
+          const motionCSS=fs.readFileSync('assets/core-motion.css','utf8');
           const scripts=html.match(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)||[];
           for(const script of scripts) {
             const code=script.replace(/^<script(?:\s[^>]*)?>/,'').replace(/<\/script>$/,'');
@@ -45,6 +48,14 @@ jobs:
           if(!css.includes('.panel{')||!css.includes('.status-card'))throw new Error('Missing classic glass CSS');
           if(!rims.includes('.panel.volumetric::before')||!rims.includes('.status-card::after')||!rims.includes('.panel.volumetric::after'))throw new Error('Missing multilayer and gradient glass rim rules');
           if(!html.includes('neon-rims.css?v=0.7')||!html.includes("' volumetric'"))throw new Error('New glass frame stylesheet or panel binding is missing');
+          if(!html.includes('core-motion.css?v=0.8')||!html.includes('core-motion.js?v=0.8'))throw new Error('Core event animation files are not loaded');
+          if(!html.includes('NeonCoreMotion.spawn(p)')||!html.includes('NeonCoreMotion.recall(p)'))throw new Error('Core scene must react to panel lifecycle');
+          for(const key of ['prism-wave-spawn','prism-wave-recall','id="coreSpawn"','id="coreRecall"']){
+            if(!html.includes(key))throw new Error('Missing core animation visual/control: '+key);
+          }
+          if(!motionCSS.includes('core-awaken-inner')||!motionCSS.includes('core-fold-wave'))throw new Error('Core animation styles are missing');
+          const coreMotion=fs.readFileSync('assets/core-motion.js','utf8');
+          if(!coreMotion.includes('function spawn(panel)')||!coreMotion.includes('function recall(panel)'))throw new Error('Both core motion phases are required');
           console.log('Classic Glass scene checks passed');
           NODE
       - name: Prepare static site
@@ -53,6 +64,8 @@ jobs:
           cp index.html _site/index.html
           cp assets/neon-classic.css _site/assets/neon-classic.css
           cp assets/neon-rims.css _site/assets/neon-rims.css
+          cp assets/core-motion.css _site/assets/core-motion.css
+          cp assets/core-motion.js _site/assets/core-motion.js
           touch _site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
