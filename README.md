@@ -1,55 +1,49 @@
 # Neon Core
 
-A futuristic, 16:9 **holographic Codex workspace** prototype designed around a readable central AI core and dense, multi-angle task panels.
+A dark, immersive 16:9 holographic interface prototype for Codex. The current online experience plays **simulated task events**; it does not yet connect to Codex App Server or execute real commands.
 
-## Online demo
+**Live demo:** https://supertms.github.io/neon-core/?v=0.3
 
-**[Open the Neon Core interactive preview](https://supertms.github.io/neon-core/?v=0.2)**
+## Pixel Genesis v0.3 — content-matched reconstruction
 
-This is a visual prototype driven by **simulated Codex events**, not a live Codex client yet. It does not run arbitrary commands or touch your project files.
+The former v0.2 animation scattered unrelated cyan/purple pixels over panels. v0.3 replaces that effect with a **rasterization of each actual task panel**:
 
-## v0.2 — Pixel Genesis
+1. Render a clean offscreen clone of the specific panel, including its final layout, text, icons, code diff colors, checks, graphs, and border.
+2. Convert that picture into a temporary canvas; render pixel cells at the *same positions and colors* as the content.
+3. Gradually reconstruct the panel from 14px blocks to 9px, 5px, 3px and finally fine pixels, with each cell appearing according to a content-aware progression.
+4. Reveal the original accessible, interactive HTML panel as the generated image resolves to full fidelity.
+5. When finished, preserve the existing retreat / shrink / fade toward the core.
 
-Task panels now have a cyberpunk materialization effect: luminous pixel clusters gather **in place** inside the workspace, a brief scan/decode phase resolves the glass display and its content, and the panel becomes stable and readable. Command, code, analysis and other panels use several related variants rather than the same entrance every time.
+No separate random-colored decoration is placed over unrelated content. Variations only affect **when real pixels appear**: command panels scan vertically, code and file panels fill laterally, test panels progress across their contents.
 
-The core remains in the center and visually above the panels. The lower workbench can materialize with a separate pixel sweep. Finished panels still retreat, shrink and fade back toward the center; reset preserves this transition.
+The primary snapshot path uses built-in SVG `foreignObject` with computed DOM styles; a structural Canvas2D drawing of the panel's actual DOM serves as a fallback when a browser cannot draw the SVG. There is no CDN dependency.
 
-To compare old and new entrance effects, use **FX: Pixel Genesis / FX: Classic** in the bottom right. Your OS's `prefers-reduced-motion` setting disables complex materialization animations.
+### Try it
 
-## Demo controls
+Use **FX: Raster Genesis / FX: Classic** at the bottom right of the online demo to switch the *next spawned panels* between pixel reconstruction and conventional entrances. **Inject event** spawns an additional panel for inspection; **Reset** returns to idle.
 
-- **Start / Resume** — begin / resume a continuing simulated task stream.
-- **Pause** — stop new task events, keep existing panels visible.
-- **Inject event** — create one additional task panel.
-- **Reset** — animate panels away and return to standby.
-- **FX: Pixel Genesis / Classic** — compare entrance treatments for subsequent panels.
+Desktop browsers are recommended. The operating system's reduced-motion preference disables complex animation. No real local code, repository secrets, or commands are exposed by this static site.
 
-## Design invariants
+## What stays the same
 
-- 16:9-focused desktop interface with deep-navy / electric-cyan color system.
-- High-density panels with varied orientation, scale and depth.
-- Central geometric AI core remains visible.
-- Holographic interfaces assemble inside the scene rather than flying outward.
-- Low-key violet folding accents; avoid excessive bloom and noisy persistent effects.
-- Panel lifecycle: materialize → decode → operate → retreat → fold → dissolve.
+- 16:9 shell and deep-navy / ice-blue / restrained-purple styling.
+- Dense floating holographic panels with varied angles and depths.
+- Center AI core remains in view; panels generate within the space rather than being fired out of it.
+- Lower horizontal workbench.
+- Panels return toward the core during their existing exit animation.
 
-## Development
+## Source and delivery
 
-All files are plain HTML, CSS and JavaScript; no install or bundling required. Open `index.html` in a modern browser or serve the repository directory:
+No dependency installation is required for the static demo. Serve the repository root:
 
-```sh
+```bash
 python -m http.server 4173
 ```
 
-Then visit <http://127.0.0.1:4173>.
+Then open http://127.0.0.1:4173.
 
-The GitHub Pages deployment workflow automatically publishes `index.html` and the `assets/` directory on pushes to `main`, after a JavaScript syntax check.
+Pushes to `main` trigger a GitHub Actions workflow that validates JavaScript syntax and deploys the HTML and asset files to GitHub Pages.
 
-## Roadmap
+## Next
 
-1. Better task-event-driven panel lifecycle, user-adjustable density and animation preferences.
-2. Real Codex App Server session, streaming updates and approval UX (desktop/backend bridge).
-3. React/TypeScript componentization and spatial 3D engine as appropriate.
-4. Desktop packaging and optimization.
-
-**Security note:** The public static preview must not expose local Codex sessions, secrets, or the App Server transport directly to the web.
+Iterate against actual browser feedback on pixel fidelity and motion cadence; then design a secure local/desktop bridge for real Codex App Server events.
