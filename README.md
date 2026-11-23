@@ -1,8 +1,28 @@
-# Neon Core · Classic Glass v0.7
+# Neon Core · Classic Glass v0.8
 
-**Online preview:** https://supertms.github.io/neon-core/?v=0.7
+**Online preview:** https://supertms.github.io/neon-core/?v=0.8
 
 Neon Core is an experimental **16:9 holographic Codex workspace**. This public site is a visual demo with simulated task events; it does **not** access a user's Codex sessions or execute real commands.
+
+## v0.8 — Event-driven AI cube motion
+
+The approved Classic Glass UI remains intact. The **central nested holographic cube** now reacts to the two real panel lifecycle transitions in the demo.
+
+**1. Cube awaken / panel emergence**
+- When a command/task/code panel is spawned, the inner cube briefly brightens and expands slightly.
+- Outer edge lines and a faint isometric resonance outline pulse outward inside the cube.
+- A thin curved locator signal briefly connects the cube to the panel's actual on-screen position as the panel materializes in place.
+- There is no flying panel projectile, repeated glitch, or full-screen particle burst.
+
+**2. Magnetic recall / panel absorption**
+- Before a completed panel retreats, the renderer captures its displayed position.
+- The panel keeps its existing gentle CSS retreat toward the center. Meanwhile a violet-to-cyan light trace travels back along a curved path toward the cube.
+- The middle cube contracts softly and the inner cube receives a restrained flash as the trace reaches the core.
+- The cube settles back into its quiet standby state.
+
+**Hands-on controls:** **+ 核心唤醒** adds a panel and triggers phase 1; **↙ 吸附回收** sends the most recently active panel back and triggers phase 2. The existing **Start demo**, **Pause**, **Inject event**, and **Reset** controls also work. Effects respect the operating system's reduced-motion setting.
+
+Implementation: SVG/core keyframe rules in `assets/core-motion.css` plus event-triggered spline light paths in `assets/core-motion.js`. Filament count is capped to avoid visual overload; temporary SVG nodes and animation frames are removed after each transition.
 
 ## v0.7 — Reference-style layered glass borders
 
