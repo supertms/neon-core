@@ -1,0 +1,55 @@
+/* Neon Core v0.9 — local Codex connection console.
+   Loaded ONLY by local/server.mjs. Not included on public GitHub Pages. */
+#neon-local{
+  position:fixed;z-index:55;right:15px;top:62px;bottom:158px;
+  width:min(385px,calc(100vw - 35px));
+  background:linear-gradient(150deg,rgba(7,28,48,.975),rgba(3,16,30,.985));
+  border:1px solid rgba(92,225,255,.57);
+  border-radius:14px;box-shadow:0 0 30px rgba(25,160,226,.23),0 20px 55px rgba(0,5,20,.5);
+  color:#dff7ff;font:12px/1.5 Inter,"Segoe UI",sans-serif;
+  display:flex;flex-direction:column;overflow:hidden;backdrop-filter:blur(18px)
+}
+#neon-local *{box-sizing:border-box}
+#neon-local .local-header{display:flex;align-items:center;gap:9px;padding:11px 13px;
+  border-bottom:1px solid rgba(88,187,231,.24);background:linear-gradient(90deg,#113b5a,#0a2143)}
+#neon-local .local-header strong{font-size:13px;letter-spacing:.3px}
+#neon-local .local-led{height:8px;width:8px;border-radius:50%;background:#faad63;box-shadow:0 0 6px #f69c5a}
+#neon-local .local-led.connected{background:#3fdbb1;box-shadow:0 0 8px #3fdbb1}
+#neon-local button{border:1px solid rgba(82,208,241,.42);border-radius:6px;color:#cef3ff;
+  background:#10364f;font-size:11px;padding:7px 10px;cursor:pointer}
+#neon-local button:hover:not(:disabled){background:#174c65;border-color:#71e7ff}
+#neon-local button:disabled{opacity:.37;cursor:not-allowed}
+#neon-local .minimize{margin-left:auto;border-color:transparent;background:transparent;font-size:13px;padding:0 6px}
+#neon-local .local-body{display:flex;flex-direction:column;min-height:0;flex:1;padding:12px 13px;gap:11px}
+#neon-local .local-caption{font-size:9px;letter-spacing:1.2px;color:#77b3d2;text-transform:uppercase}
+#neon-local label{display:block;font-size:10px;color:#b6d8e9;margin-bottom:5px}
+#neon-local input,#neon-local textarea{
+  display:block;border:1px solid rgba(78,170,222,.39);border-radius:6px;
+  padding:9px 10px;color:#e8f8ff;background:#061a2e;outline:none;width:100%;
+  font:11px/1.45 Consolas,"Microsoft YaHei",monospace
+}
+#neon-local input:focus,#neon-local textarea:focus{border-color:#57e1ff;box-shadow:0 0 0 2px rgba(75,209,255,.12)}
+#neon-local textarea{height:90px;resize:vertical}
+#neon-local .btn-row{display:flex;gap:6px;align-items:center}
+#neon-local .btn-row button:first-child{background:#105273;border-color:#48cde7}
+#neon-local .read-only{color:#9bdcf7;font-size:9px}
+#neon-local .message-list{flex:1;min-height:75px;overflow-y:auto;padding:9px;border:1px solid rgba(57,143,190,.28);
+  border-radius:7px;background:rgba(3,17,31,.68);scrollbar-color:#1d6f93 transparent}
+#neon-local .message{padding:5px 0;border-bottom:1px solid rgba(90,143,174,.1);font-size:10px;color:#b4d6eb;overflow-wrap:anywhere;white-space:pre-wrap}
+#neon-local .message.user{color:#80eaff}
+#neon-local .message.error{color:#ff9aaf}
+#neon-local .message.codex{color:#8af2c8}
+#neon-local .approval{
+  border:1px solid rgba(240,183,80,.72);background:rgba(79,45,18,.42);
+  border-radius:8px;padding:10px;color:#ffd8a5;font-size:10px;
+}
+#neon-local .approval p{margin:4px 0 9px;white-space:pre-wrap;max-height:86px;overflow:auto;overflow-wrap:anywhere}
+#neon-local .approval button{background:#433018;border-color:#c89a54;color:#ffebd0}
+#neon-local .approval .deny{background:#503037;border-color:#e58a9f;color:#ffe8ed}
+#neon-local.minimized{top:auto;bottom:168px;width:242px;height:auto}
+#neon-local.minimized .local-body{display:none}
+#neon-local .local-footer{color:#638ba6;font-size:9px;line-height:1.5}
+@media(max-height:720px){
+  #neon-local{bottom:128px}
+  #neon-local.minimized{bottom:131px}
+}
