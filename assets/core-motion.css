@@ -1,0 +1,117 @@
+/* Neon Core · v0.8 | Event-driven Cube resonance & panel recall
+   Restrained Classic-glass motion. No idle particle storm. */
+
+.core.core-prism .prism-outer,
+.core.core-prism .prism-middle,
+.core.core-prism .prism-inner,
+.core.core-prism .prism-wave-spawn,
+.core.core-prism .prism-wave-recall{
+  transform-box:fill-box;
+  transform-origin:center;
+}
+.core.core-prism .prism-wave-spawn,
+.core.core-prism .prism-wave-recall{opacity:0;pointer-events:none}
+.core.core-prism.core-spawn .prism-outer{
+  animation:core-awaken-outer 770ms ease-out both
+}
+.core.core-prism.core-spawn .prism-inner{
+  animation:core-awaken-inner 770ms cubic-bezier(.2,.8,.35,1) both
+}
+.core.core-prism.core-spawn .prism-wave-spawn{
+  animation:core-mark-space 820ms ease-out both
+}
+.core.core-prism.core-recall .prism-middle{
+  animation:core-draw-in-middle 1500ms cubic-bezier(.22,.65,.31,1) both
+}
+.core.core-prism.core-recall .prism-inner{
+  animation:core-absorb-heart 1500ms cubic-bezier(.17,.7,.3,1) both
+}
+.core.core-prism.core-recall .prism-wave-recall{
+  animation:core-fold-wave 1500ms ease-in-out both
+}
+@keyframes core-awaken-outer{
+  0%{filter:brightness(.95) drop-shadow(0 0 2px #35cfff66);transform:scale(1)}
+  29%{filter:brightness(1.45) drop-shadow(0 0 6px #47dfff99);transform:scale(1.028)}
+  60%{filter:brightness(1.2) drop-shadow(0 0 4px #43cfff88);transform:scale(1.012)}
+  100%{filter:brightness(1) drop-shadow(0 0 3px #2bcfff55);transform:scale(1)}
+}
+@keyframes core-awaken-inner{
+  0%{filter:brightness(1);transform:scale(.97)}
+  34%{filter:brightness(1.8) drop-shadow(0 0 10px #7ef0ff);transform:scale(1.08)}
+  67%{filter:brightness(1.28) drop-shadow(0 0 5px #49dfff);transform:scale(1.025)}
+  100%{filter:brightness(1);transform:scale(1)}
+}
+@keyframes core-mark-space{
+  0%{opacity:0;transform:scale(.7);filter:brightness(1)}
+  24%{opacity:.8;transform:scale(.98);filter:brightness(1.35)}
+  64%{opacity:.40;transform:scale(1.24)}
+  100%{opacity:0;transform:scale(1.43)}
+}
+@keyframes core-draw-in-middle{
+  0%{filter:brightness(1);transform:scale(1)}
+  29%{filter:brightness(1.13);transform:scale(1.05)}
+  57%{filter:brightness(1.32) drop-shadow(0 0 6px #8d7aff77);transform:scale(.95)}
+  80%{filter:brightness(1.5) drop-shadow(0 0 8px #51dcff88);transform:scale(.92)}
+  100%{filter:brightness(1);transform:scale(1)}
+}
+@keyframes core-absorb-heart{
+  0%{filter:brightness(1);transform:scale(1)}
+  35%{filter:brightness(1.03);transform:scale(.98)}
+  66%{filter:brightness(1.53) drop-shadow(0 0 7px #75eaff);transform:scale(.93)}
+  84%{filter:brightness(1.95) drop-shadow(0 0 12px #bdffffaa);transform:scale(1.09)}
+  100%{filter:brightness(1);transform:scale(1)}
+}
+@keyframes core-fold-wave{
+  0%{opacity:0;transform:scale(1.5)}
+  16%{opacity:.2}
+  56%{opacity:.58;transform:scale(1.02)}
+  82%{opacity:.85;transform:scale(.59)}
+  100%{opacity:0;transform:scale(.35)}
+}
+
+/* SVG data filaments pass behind the central core and the real panel UI.
+   The incoming signal is violet-to-cyan. The outgoing *marker* is very subtle. */
+.core-motion-paths{
+  position:absolute;inset:0;
+  width:100%;height:100%;
+  overflow:hidden;
+  z-index:7;
+  pointer-events:none;
+  user-select:none;
+}
+.core-motion-paths .signal-route{
+  stroke-linecap:round;
+  fill:none;
+  stroke-width:1.45px;
+  opacity:.58;
+  filter:drop-shadow(0 0 3px rgba(55,208,255,.35))
+}
+.core-motion-paths .signal-route.recall{
+  stroke-width:1.7px;
+  filter:drop-shadow(0 0 4px rgba(132,111,255,.42))
+}
+.core-motion-paths .signal-head{
+  opacity:.72;
+  filter:drop-shadow(0 0 4px rgba(67,223,255,.65))
+}
+.core-motion-paths .signal-head.recall{
+  filter:drop-shadow(0 0 6px rgba(151,122,255,.75))
+}
+.core-motion-paths .signal-anchor{
+  fill:none;
+  stroke:#56deff;
+  stroke-width:1.1px;
+  opacity:0;
+}
+.core-motion-paths .signal-anchor.recall{stroke:#a98bff}
+@media(prefers-reduced-motion:reduce){
+  .core.core-prism.core-spawn .prism-outer,
+  .core.core-prism.core-spawn .prism-inner,
+  .core.core-prism.core-spawn .prism-wave-spawn,
+  .core.core-prism.core-recall .prism-middle,
+  .core.core-prism.core-recall .prism-inner,
+  .core.core-prism.core-recall .prism-wave-recall{
+    animation:none!important;
+  }
+  .core-motion-paths{display:none!important}
+}
