@@ -1,0 +1,41 @@
+/* Pixel Genesis v0.3 — the PIXELS ARE THE PANEL, not particles above it.
+   The canvas samples each panel's final UI and progressively reconstructs it. */
+.panel.pixel-assembling {
+  opacity:1;
+  filter:none;
+  pointer-events:none;
+  background:transparent;
+  border-color:transparent;
+  box-shadow:none;
+  transition:none;
+  overflow:hidden;
+}
+.panel.pixel-assembling::before { opacity:0; }
+.panel.pixel-assembling .panel-head,
+.panel.pixel-assembling .panel-content {visibility:hidden}
+.panel.pixel-assembling .panel-pixel-canvas {
+  position:absolute;
+  inset:0;
+  display:block;
+  width:100%;
+  height:100%;
+  image-rendering:pixelated;
+  z-index:15;
+  opacity:1;
+  pointer-events:none;
+  filter:drop-shadow(0 0 2px rgba(42,200,255,.32));
+  transition:none;
+}
+.panel.pixel-assembling.pixel-resolved {
+  background:linear-gradient(145deg,rgba(8,38,61,.94),rgba(5,19,34,.88));
+  border-color:rgba(73,199,245,.72);
+  box-shadow:inset 0 0 25px rgba(56,183,237,.08),0 0 17px rgba(43,173,231,.19);
+}
+.panel.pixel-assembling.pixel-resolved::before {opacity:1}
+.panel.pixel-assembling.pixel-resolved .panel-head,
+.panel.pixel-assembling.pixel-resolved .panel-content {visibility:visible}
+@media (prefers-reduced-motion:reduce) {
+  .panel.pixel-assembling .panel-pixel-canvas {display:none!important}
+  .panel.pixel-assembling .panel-head,
+  .panel.pixel-assembling .panel-content {visibility:visible!important}
+}
