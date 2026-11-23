@@ -91,6 +91,42 @@ test('local bridge performs real JSONL session, turn events, and manual approval
     assert.equal(decision.ok,true);
     const finished=await nextUntil(x=>x.type==='codex'&&x.method==='turn/completed');
     assert.equal(finished.params.turn.status,'completed');
+
+    // Invalid/implicit write attempts must fail before reaching App Server.
+    const invalid=await fetch(base+'/api/session',{
+      method:'POST',headers,
+      body:JSON.stringify({cwd:process.cwd(),mode:'dangerFullAccess'})
+    });
+    assert.equal(invalid.status,400);
+    const notConfirmed=await fetch(base+'/api/session',{
+      method:'POST',headers,
+      body:JSON.stringify({cwd:process.cwd(),mode:'workspaceWrite',
+        confirmWorkspace:process.cwd()})
+    });
+    assert.equal(notConfirmed.status,400);
+
+    // An explicit per-session opt-in unlocks only the selected workspace.
+    const writeSession=await send('/api/session',{
+      cwd:process.cwd(),mode:'workspaceWrite',confirmWorkspace:process.cwd(),
+      writeConsent:'ALLOW_WORKSPACE_EDITS'
+    });
+    assert.equal(writeSession.sessionMode,'workspaceWrite');
+    assert.equal(writeSession.readOnly,false);
+    assert.equal(writeSession.threadId,'thread-write');
+
+    const writeTurn=await send('/api/turn',{prompt:'Edit demo.txt inside this workspace'});
+    assert.equal(writeTurn.turnId,'turn-write');
+    const diff=await nextUntil(x=>x.type==='codex'&&x.method==='turn/diff/updated');
+    assert.match(diff.params.diff,/\+new/);
+    const fileEvent=await nextUntil(x=>x.type==='codex'&&x.method==='item/started'&&x.params.item.type==='fileChange');
+    assert.equal(fileEvent.params.item.changes[0].path,'demo.txt');
+    const fileApproval=await nextUntil(x=>x.type==='approval'&&x.method==='item/fileChange/requestApproval');
+    assert.equal(fileApproval.requestId,'92');
+    assert.equal(fileApproval.params.grantRoot,process.cwd());
+    const declined=await send('/api/approval',{requestId:'92',decision:'decline'});
+    assert.equal(declined.ok,true);
+    const writeDone=await nextUntil(x=>x.type==='codex'&&x.method==='turn/completed'&&x.params.turn.id==='turn-write');
+    assert.equal(writeDone.params.turn.status,'completed');
   }finally{
     abort?.abort();
     reader?.cancel().catch(()=>{});
