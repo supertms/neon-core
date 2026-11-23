@@ -60,6 +60,7 @@
 @media(max-width:1250px){.body{grid-template-columns:145px 1fr}.sidebar{padding:12px 8px}.brand{min-width:220px}.nav{gap:15px}.panel{transform:translate(-50%,-50%) rotateX(calc(var(--rx)*.8)) rotateY(calc(var(--ry)*.8)) rotateZ(var(--rz)) translateZ(var(--z)) scale(.86)}}
 @media(max-height:760px){.panel{scale:.85}.workbench{top:87%;height:120px}.core{top:45%;scale:.85}.platform{top:69%}}
 </style>
+<link rel="stylesheet" href="./assets/pixel-genesis.css?v=0.2">
 </head>
 <body>
 <div class="app">
@@ -70,10 +71,11 @@
 <div class="core"><div class="core-halo"></div><div class="core-halo h2"></div><div class="core-halo h3"></div><div class="core-cube"><i></i><i></i><i></i><i></i><i></i><i></i></div><div class="core-orb"></div><div class="core-label">NEON CORE <small>AI ENGINE · ONLINE</small></div></div><div class="platform"></div>
 <div class="panel-layer" id="panels"></div><div class="micro-layer" id="micros"></div>
 <div class="workbench hidden" id="workbench"><article class="deck"><h4>▣　TEST PLAN <b>LIVE</b></h4><p><b>✓</b> Unit tests (36)</p><p><b>✓</b> Integration tests (8)</p><p>○　E2E tests (3)</p><p>○　Coverage ≥ 90%</p></article><article class="deck"><h4>⌘　EXECUTION STREAM</h4><p>12:02:19　› scan --deep --project</p><p>12:02:26　› analyze --impact --tests</p><p><b>12:02:41　✓ plan.generate --e2e</b></p><p>12:03:04　› tests.build --unit</p></article><article class="deck"><h4>⌘　TASK FLOW</h4><p>PLAN　 →　 BUILD　 →　 TEST　 →　 VERIFY</p><div class="graph"><i style="--h:30%"></i><i style="--h:60%"></i><i style="--h:45%"></i><i style="--h:90%"></i><i style="--h:72%"></i><i style="--h:100%"></i></div></article></div>
-<div class="caption"><i></i><span id="sceneStatus">HOLOGRAPHIC WORKSPACE · STANDBY</span>　<span id="count">00 EVENTS</span></div><div class="controls"><button class="primary" id="play">▶ Start demo</button><button id="pause">Ⅱ Pause</button><button id="inject">＋ Inject event</button><button id="reset">↺ Reset</button></div>
+<div class="caption"><i></i><span id="sceneStatus">HOLOGRAPHIC WORKSPACE · STANDBY</span>　<span id="count">00 EVENTS</span></div><div class="controls"><button id="fxmode" class="fx-enabled" title="Toggle panel arrival animation">✦ FX: Pixel Genesis</button><button class="primary" id="play">▶ Start demo</button><button id="pause">Ⅱ Pause</button><button id="inject">＋ Inject event</button><button id="reset">↺ Reset</button></div>
 </section></main></div>
 <footer class="status"><span>●　Workspace: <strong>Codex Core</strong></span><span>⑂ main · a7f3e2c</span><span>✓ All systems operational</span><span class="metric">CPU　<b>24%</b></span><span class="metric">MEM　<b>38%</b></span><span class="metric">GPU　<b>12%</b></span><span>Agents 12/12</span></footer>
 </div>
+<script src="./assets/pixel-genesis.js?v=0.2"></script>
 <script>
 const layer=document.getElementById('panels'),microLayer=document.getElementById('micros'),deck=document.getElementById('workbench'),status=document.getElementById('sceneStatus'),count=document.getElementById('count');
 const templates=[
@@ -90,16 +92,111 @@ const slots=[{x:17,y:25,rx:3,ry:16,rz:-2,z:18},{x:82,y:22,rx:5,ry:-16,rz:2,z:26}
 const microSlots=[[7,12,92,48,2,16,-2,0],[27,9,78,42,4,12,1,8],[44,10,76,42,6,-6,-2,0],[62,9,82,44,5,-12,2,5],[94,12,92,48,4,-17,3,4],[5,49,84,46,4,15,2,12],[36,42,72,40,0,12,-3,-2],[67,43,82,44,2,-10,2,6],[96,54,84,48,4,-16,1,2],[7,78,88,48,5,18,-3,0],[92,77,90,48,6,-15,2,5],[31,78,76,40,6,10,3,8],[70,79,78,42,5,-10,-2,4],[45,68,72,38,3,0,2,0]];
 let active=[],micros=[],event=0,cursor=0,slotCursor=0,microCursor=0,timer=null,running=false,deckVisible=false;
 function update(){count.textContent=String(event).padStart(2,'0')+' EVENTS'}
-function panel(t){let s=slots[slotCursor++%slots.length],p=document.createElement('article');event++;update();p.className='panel entering';p.style.setProperty('--x',s.x+'%');p.style.setProperty('--y',s.y+'%');p.style.setProperty('--w',t.w+'px');p.style.setProperty('--h',t.h+'px');p.style.setProperty('--rx',s.rx+'deg');p.style.setProperty('--ry',s.ry+'deg');p.style.setProperty('--rz',s.rz+'deg');p.style.setProperty('--z',s.z+'px');p.innerHTML='<div class="panel-head"><span class="icon">'+t.icon+'</span><b>'+t.title+'</b><span class="state">'+t.live+'</span></div><div class="panel-content">'+t.body+'</div>';layer.appendChild(p);active.push(p);requestAnimationFrame(()=>requestAnimationFrame(()=>{p.classList.remove('entering');p.classList.add('active')}));if(active.filter(x=>!x.classList.contains('retreating')).length>9)retire(active.find(x=>!x.classList.contains('retreating')));if(event%2===0)micro();deck.classList.remove('hidden');deckVisible=true;status.textContent='LIVE TASK STREAM · '+t.title}
-function micro(){let s=microSlots[microCursor++%microSlots.length],m=document.createElement('div');m.className='micro entering';m.style.setProperty('--x',s[0]+'%');m.style.setProperty('--y',s[1]+'%');m.style.setProperty('--w',s[2]+'px');m.style.setProperty('--h',s[3]+'px');m.style.setProperty('--rx',s[4]+'deg');m.style.setProperty('--ry',s[5]+'deg');m.style.setProperty('--rz',s[6]+'deg');m.style.setProperty('--z',s[7]+'px');microLayer.appendChild(m);micros.push(m);requestAnimationFrame(()=>requestAnimationFrame(()=>m.classList.remove('entering')));if(micros.filter(x=>!x.classList.contains('retreating')).length>13)retire(micros.find(x=>!x.classList.contains('retreating')))}
-function retire(p){if(!p||p.classList.contains('retreating'))return;p.classList.remove('active');p.classList.add('retreating');setTimeout(()=>{p.remove();active=active.filter(x=>x!==p)},1900)}
-function retireMicro(p){if(!p||p.classList.contains('retreating'))return;p.classList.add('retreating');setTimeout(()=>{p.remove();micros=micros.filter(x=>x!==p)},1700)}
-function start(){if(running)return;running=true;document.getElementById('play').textContent='● Demo running';status.textContent='LIVE · CODEX EVENT SIMULATION';deck.classList.remove('hidden');if(!active.length){panel(templates[0]);panel(templates[1])}timer=setInterval(()=>panel(templates[cursor++%templates.length]),920)}
-function pause(){running=false;if(timer)clearInterval(timer);timer=null;document.getElementById('play').textContent='▶ Resume demo';status.textContent='PAUSED · PANELS HOLD POSITION'}
+function panel(t){
+  const s=slots[slotCursor++%slots.length];
+  const p=document.createElement('article');
+  event++;update();
+  p.style.setProperty('--x',s.x+'%');
+  p.style.setProperty('--y',s.y+'%');
+  p.style.setProperty('--w',t.w+'px');
+  p.style.setProperty('--h',t.h+'px');
+  p.style.setProperty('--rx',s.rx+'deg');
+  p.style.setProperty('--ry',s.ry+'deg');
+  p.style.setProperty('--rz',s.rz+'deg');
+  p.style.setProperty('--z',s.z+'px');
+  p.className='panel entering';
+  p.innerHTML='<div class="panel-head"><span class="icon">'+t.icon+'</span><b>'+t.title+'</b><span class="state">'+t.live+'</span></div><div class="panel-content">'+t.body+'</div>';
+  const pixelArrival=window.NeonPixel && window.NeonPixel.attachPanel(p,t.kind,event);
+  layer.appendChild(p);
+  active.push(p);
+  if(!pixelArrival)requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    if(!p.classList.contains('retreating')){p.classList.remove('entering');p.classList.add('active')}
+  }));
+  if(active.filter(x=>!x.classList.contains('retreating')).length>9){
+    retire(active.find(x=>!x.classList.contains('retreating')));
+  }
+  if(event%2===0)micro();
+  if(!deckVisible){
+    deck.classList.remove('hidden');
+    deckVisible=true;
+    if(window.NeonPixel)window.NeonPixel.revealDeck(deck);
+  }
+  status.textContent='LIVE TASK STREAM · '+t.title;
+}
+function micro(){
+  const s=microSlots[microCursor++%microSlots.length];
+  const m=document.createElement('div');
+  m.className='micro entering';
+  m.style.setProperty('--x',s[0]+'%');
+  m.style.setProperty('--y',s[1]+'%');
+  m.style.setProperty('--w',s[2]+'px');
+  m.style.setProperty('--h',s[3]+'px');
+  m.style.setProperty('--rx',s[4]+'deg');
+  m.style.setProperty('--ry',s[5]+'deg');
+  m.style.setProperty('--rz',s[6]+'deg');
+  m.style.setProperty('--z',s[7]+'px');
+  const pixelArrival=window.NeonPixel && window.NeonPixel.attachMicro(m);
+  microLayer.appendChild(m);micros.push(m);
+  if(!pixelArrival)requestAnimationFrame(()=>requestAnimationFrame(()=>m.classList.remove('entering')));
+  if(micros.filter(x=>!x.classList.contains('retreating')).length>13){
+    retireMicro(micros.find(x=>!x.classList.contains('retreating')));
+  }
+}
+function retire(p){
+  if(!p||p.classList.contains('retreating'))return;
+  p.classList.remove('active','materializing','variant-voxel','variant-scan','variant-slice');
+  p.querySelector('.genesis-vfx')?.remove();
+  p.classList.add('retreating');
+  setTimeout(()=>{p.remove();active=active.filter(x=>x!==p)},1950);
+}
+function retireMicro(p){
+  if(!p||p.classList.contains('retreating'))return;
+  p.classList.remove('micro-materializing');
+  p.classList.add('retreating');
+  setTimeout(()=>{p.remove();micros=micros.filter(x=>x!==p)},1750);
+}
+function start(){
+  if(running)return;
+  running=true;
+  document.getElementById('play').textContent='● Demo running';
+  status.textContent='LIVE · CODEX EVENT SIMULATION';
+  if(!active.some(p=>!p.classList.contains('retreating'))){
+    panel(templates[0]);panel(templates[1]);
+  }
+  timer=setInterval(()=>panel(templates[cursor++%templates.length]),1040);
+}
+function pause(){
+  running=false;if(timer)clearInterval(timer);timer=null;
+  document.getElementById('play').textContent='▶ Resume demo';
+  status.textContent='PAUSED · PANELS HOLD POSITION';
+}
 function inject(){panel(templates[cursor++%templates.length])}
-function reset(){pause();active.forEach(retire);micros.forEach(retireMicro);active=[];micros=[];setTimeout(()=>{layer.innerHTML='';microLayer.innerHTML=''},80);event=0;cursor=0;slotCursor=0;microCursor=0;update();deck.classList.add('hidden');deckVisible=false;status.textContent='HOLOGRAPHIC WORKSPACE · STANDBY';document.getElementById('play').textContent='▶ Start demo'}
+function reset(){
+  pause();
+  active.filter(p=>!p.classList.contains('retreating')).forEach(retire);
+  micros.filter(m=>!m.classList.contains('retreating')).forEach(retireMicro);
+  event=0;cursor=0;slotCursor=0;microCursor=0;update();
+  deck.classList.add('hidden');deckVisible=false;
+  status.textContent='HOLOGRAPHIC WORKSPACE · STANDBY';
+  document.getElementById('play').textContent='▶ Start demo';
+}
 document.getElementById('play').onclick=start;document.getElementById('pause').onclick=pause;document.getElementById('inject').onclick=inject;document.getElementById('reset').onclick=reset;
-window.setTimeout(()=>{deck.classList.remove('hidden');deckVisible=true;start()},650);
+const fxButton=document.getElementById('fxmode');
+let pixelFX=true;
+fxButton.onclick=()=>{
+  pixelFX=!pixelFX;
+  if(window.NeonPixel)window.NeonPixel.setEnabled(pixelFX);
+  fxButton.classList.toggle('fx-enabled',pixelFX);
+  fxButton.textContent=pixelFX?'✦ FX: Pixel Genesis':'◇ FX: Classic';
+  fxButton.title='Changes the next panels as they appear';
+};
+if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  fxButton.disabled=true;
+  fxButton.classList.remove('fx-enabled');
+  fxButton.textContent='◇ Reduced motion';
+  fxButton.title='Your system requests reduced motion';
+}
+window.setTimeout(start,650);
 </script>
 </body>
 </html>
