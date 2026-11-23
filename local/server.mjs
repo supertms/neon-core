@@ -35,6 +35,7 @@ const approvals = new Map();
 let threadId = null;
 let activeTurn = null;
 let workspace = null;
+let sessionMode = 'readOnly';
 let accountType = null;
 let connecting = false;
 
@@ -99,6 +100,15 @@ function handleServerRequest(message) {
   }
   const key = String(message.id);
   const params = message.params || {};
+  // A response from a different or expired thread cannot be approved by this UI.
+  if (params.threadId && params.threadId !== threadId) {
+    rpc.reply(message.id, { decision: 'decline' });
+    return;
+  }
+  if (message.method === 'item/fileChange/requestApproval' && sessionMode !== 'workspaceWrite') {
+    rpc.reply(message.id, { decision: 'decline' });
+    return;
+  }
   if (approvals.has(key)) return;
   const timer = setTimeout(() => decide(key, 'decline'), 120000);
   approvals.set(key, { message, timer });
@@ -112,6 +122,9 @@ function handleServerRequest(message) {
         safeMessage(params.command || ''),
       cwd: safeMessage(params.cwd || ''),
       itemId: params.itemId || null,
+      threadId: params.threadId || null,
+      turnId: params.turnId || null,
+      grantRoot: safeMessage(params.grantRoot || ''),
       networkApprovalContext: params.networkApprovalContext || null
     }
   });
@@ -181,7 +194,8 @@ async function routes(req, res, url) {
     return json(res, 200, {
       mode: 'local', token: TOKEN, connected: rpc.ready,
       threadId, turnId: activeTurn, cwd: workspace,
-      accountType, readOnly: true, approvalCount: approvals.size
+      accountType, readOnly: sessionMode === 'readOnly', sessionMode,
+      approvalCount: approvals.size
     });
   }
 
@@ -195,7 +209,8 @@ async function routes(req, res, url) {
     }));
     res.write(': connected\n\n');
     clients.add(res);
-    sendEvent(res, { type: 'state', threadId, turnId: activeTurn, cwd: workspace, connected: rpc.ready });
+    sendEvent(res, { type: 'state', threadId, turnId: activeTurn, cwd: workspace,
+      connected: rpc.ready, sessionMode, readOnly: sessionMode === 'readOnly' });
     for (const [key, entry] of approvals) {
       sendEvent(res, { type: 'approval', requestId: key, method: entry.message.method,
         params: entry.message.params || {} });
@@ -215,13 +230,24 @@ async function routes(req, res, url) {
   const data = await body(req);
 
   if (url.pathname === '/api/session') {
-    if (connecting) return json(res, 409, { error: 'Already connecting.' });
+    if (connecting || activeTurn || approvals.size) return json(res, 409, {
+      error: 'Stop the current turn and resolve approvals before changing the project or permissions.'
+    });
     const cwd = data.cwd;
+    const requestedMode = data.mode === undefined ? 'readOnly' : data.mode;
+    if (!['readOnly','workspaceWrite'].includes(requestedMode)) {
+      return json(res, 400, { error: 'Only readOnly and workspaceWrite modes are supported.' });
+    }
     if (typeof cwd !== 'string' || cwd.length > 2048 || !isAbsolute(cwd)) {
       return json(res, 400, { error: 'Choose an existing absolute project folder.' });
     }
     const full = await realpath(cwd);
     if (!(await stat(full)).isDirectory()) return json(res, 400, { error: 'Not a directory.' });
+    if (requestedMode === 'workspaceWrite' && data.confirmWorkspace !== full) {
+      return json(res, 400, {
+        error: 'Write access requires an explicit confirmation matching the canonical project path.'
+      });
+    }
     connecting = true;
     try {
       await rpc.start();
@@ -229,17 +255,20 @@ async function routes(req, res, url) {
       if (account.requiresOpenaiAuth && !account.account) {
         return json(res, 401, { error: 'Codex not signed in. Run "codex login" in a local terminal.' });
       }
-      // Only read access in the first real version. No full-access escalation.
+      // Never use dangerFullAccess. Writable mode is strictly opt-in and rooted
+      // in the chosen workspace with network disabled at the sandbox layer.
       const response = await rpc.call('thread/start', {
-        cwd: full, sandbox: 'read-only', approvalPolicy: 'on-request',
+        cwd: full, sandbox: requestedMode, approvalPolicy: 'on-request',
         serviceName: 'neon_core'
       });
       if (!response.thread?.id) throw new Error('thread/start did not return a thread id.');
       workspace = full;
       threadId = response.thread.id;
+      sessionMode = requestedMode;
       accountType = account.account?.type || null;
-      broadcast({ type: 'state', connected: true, cwd: workspace, threadId, readOnly: true });
-      return json(res, 200, { ok: true, threadId, cwd: workspace, readOnly: true, accountType });
+      const readOnly = sessionMode === 'readOnly';
+      broadcast({ type: 'state', connected: true, cwd: workspace, threadId, readOnly, sessionMode });
+      return json(res, 200, { ok: true, threadId, cwd: workspace, readOnly, sessionMode, accountType });
     } finally {
       connecting = false;
     }
@@ -258,7 +287,9 @@ async function routes(req, res, url) {
         threadId, cwd: workspace,
         input: [{ type: 'text', text: prompt.trim() }],
         approvalPolicy: 'on-request',
-        sandboxPolicy: { type: 'readOnly' }
+        sandboxPolicy: sessionMode === 'workspaceWrite'
+          ? { type: 'workspaceWrite', writableRoots: [workspace], networkAccess: false }
+          : { type: 'readOnly' }
       });
       if (!result.turn?.id) throw new Error('turn/start did not return a turn id.');
       // Completion may race with the request response; only replace while starting.
@@ -342,7 +373,7 @@ const server = createServer(async (req, res) => {
 server.on('upgrade', (_request, socket) => socket.destroy());
 server.listen(PORT, '127.0.0.1', () => {
   console.log('Neon Core local Codex bridge at http://127.0.0.1:' + PORT);
-  console.log('Local-only read-only prototype. Sign in with "codex login" first.');
+  console.log('Local-only connection. Read-only by default; explicit workspaceWrite opt-in required. Sign in with "codex login" first.');
 });
 for (const signal of ['SIGINT', 'SIGTERM']) {
   process.once(signal, () => {
