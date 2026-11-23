@@ -133,7 +133,24 @@ function decide(requestId, decision) {
 
 rpc.on('serverRequest', handleServerRequest);
 rpc.on('notification', (msg) => {
-  if (msg.method === 'turn/completed') activeTurn = null;
+  if (msg.method === 'turn/completed') {
+    activeTurn = null;
+    // Stale prompts are never left actionable after a turn has finished.
+    for (const [key, entry] of approvals) {
+      clearTimeout(entry.timer);
+      approvals.delete(key);
+      broadcast({ type: 'approvalResolved', requestId: key, decision: 'expired' });
+    }
+  }
+  if (msg.method === 'serverRequest/resolved' && msg.params?.requestId !== undefined) {
+    const key = String(msg.params.requestId);
+    const entry = approvals.get(key);
+    if (entry) {
+      clearTimeout(entry.timer);
+      approvals.delete(key);
+      broadcast({ type: 'approvalResolved', requestId: key, decision: 'expired' });
+    }
+  }
   if (msg.method === 'account/updated') {
     accountType = msg.params?.authMode || null;
   }
