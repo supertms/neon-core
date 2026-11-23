@@ -71,17 +71,46 @@ function json(res, status, body) {
   res.end(JSON.stringify(body));
 }
 
+function compactEvent(message) {
+  const data = JSON.stringify(message);
+  if (data.length <= MAX_EVENT_CHARS) return data;
+  if (message.type !== 'codex') return JSON.stringify({
+    type: 'notice', message: 'An oversized non-Codex event was omitted.'
+  });
+
+  // Preserve the useful event and safely truncate large tool/diff text fields.
+  const params = structuredClone(message.params || {});
+  if (typeof params.diff === 'string') {
+    params.diff = params.diff.slice(0, MAX_EVENT_CHARS - 3200);
+    params.diffTruncated = true;
+  }
+  if (params.item && typeof params.item.aggregatedOutput === 'string') {
+    params.item.aggregatedOutput = params.item.aggregatedOutput.slice(-14000);
+    params.item.outputTruncated = true;
+  }
+  if (Array.isArray(params.item?.changes)) {
+    params.item.changes = params.item.changes.slice(0, 35).map(c => ({
+      ...c, diff: typeof c.diff === 'string' ? c.diff.slice(0, 2500) : c.diff
+    }));
+  }
+  if (typeof params.delta === 'string') {
+    params.delta = params.delta.slice(0, 12000);
+    params.deltaTruncated = true;
+  }
+  const compact = JSON.stringify({ ...message, params });
+  if (compact.length <= MAX_EVENT_CHARS) return compact;
+  return JSON.stringify({
+    type: 'notice',
+    message: 'One oversized event was omitted; the session remains active.'
+  });
+}
+
 function sendEvent(client, message) {
   if (client.destroyed || !client.writable) {
     clients.delete(client);
     return;
   }
-  const data = JSON.stringify(message);
-  if (data.length > MAX_EVENT_CHARS) {
-    client.write('data: ' + JSON.stringify({ type: 'notice', message: 'A very large event was truncated.' }) + '\n\n');
-  } else {
-    client.write('data: ' + data + '\n\n');
-  }
+  client.write('data: ' + compactEvent(message) + '\n\n');
 }
 
 function broadcast(message) {
