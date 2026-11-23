@@ -2,7 +2,7 @@
 
 A dark, immersive 16:9 holographic interface prototype for Codex. The current online experience plays **simulated task events**; it does not yet connect to Codex App Server or execute real commands.
 
-**Live demo:** https://supertms.github.io/neon-core/?v=0.4
+**Live demo:** https://supertms.github.io/neon-core/?v=0.5
 
 ## Pixel Genesis v0.3 — content-matched reconstruction
 
@@ -32,6 +32,23 @@ Desktop browsers are recommended. The operating system's reduced-motion preferen
 - Lower horizontal workbench.
 - Panels return toward the core during their existing exit animation.
 
+
+## v0.5 — Live panel materialization speed
+
+The **入场速度 (Generation speed)** slider in the lower-right control bar adjusts the **Pixel Genesis animation playback rate**, not the task event rate. The setting is saved locally for your next visit.
+
+| Speed | Typical arrival time |
+|---|---|
+| 0.25× | about 3.7–5 seconds |
+| **0.50× (default)** | **about 1.8–2.5 seconds** |
+| 0.75× | about 1.2–1.7 seconds |
+| 1.00× | about 0.9–1.3 seconds (v0.4 pace) |
+| 1.50× | about 0.6–0.9 seconds |
+| 2.00× | about 0.45–0.65 seconds |
+
+The slider affects animations **already in progress** on the next frame as well as future panels, so you can compare different speeds without restarting the demo. A light ~30 fps render throttle helps keep the content-driven pixel renderer responsive at low speeds and with overlapping panels. Choosing Classic FX bypasses the pixel speed control.
+
+Motion preferences take precedence: if the system requests reduced motion, complex pixel animations remain disabled.
 
 ## Neon Matrix v0.4 — richer pixels, varied assembly
 
