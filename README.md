@@ -1,8 +1,22 @@
-# Neon Core · Classic Glass v0.6
+# Neon Core · Classic Glass v0.7
 
-**Online preview:** https://supertms.github.io/neon-core/?v=0.6
+**Online preview:** https://supertms.github.io/neon-core/?v=0.7
 
 Neon Core is an experimental **16:9 holographic Codex workspace**. This public site is a visual demo with simulated task events; it does **not** access a user's Codex sessions or execute real commands.
+
+## v0.7 — Reference-style layered glass borders
+
+This iteration concentrates on the user's **two border reference details**, without changing the accepted Classic motion:
+
+- **Volumetric (thick) rims** for the main Task, Code, File and Command panels: rounded cyan outer border, luminous beveled left/top strips, a recessed second contour, soft external bloom and transparent navy glass filling.
+- **Thin gradient rims** for supportive panels and the five lower status cards: cyan/ice-blue on the upper-left edge transitioning through blue to violet on the lower-right, with subtle corner glow.
+- **Angled workbench panels** gain medium-weight illuminated edges; distant micro panels get a muted thin gradient to preserve hierarchy.
+- Pure CSS gradients, inner bevels and shadow layers. Text and controls remain real HTML; there is no static screenshot substitution.
+- All panel lifecycle behavior remains unchanged: soft Classic entrance and slow retreat back toward the central nested cube.
+
+The new rules are kept in `assets/neon-rims.css`, loaded **after** `assets/neon-classic.css` so their style hierarchy can be adjusted independently.
+
+This is a browser approximation of the reference's cinematic glass thickness. It is not physically ray-traced transparent glass.
 
 ## Design direction
 
