@@ -62,6 +62,7 @@
 </style>
 <link rel="stylesheet" href="./assets/neon-classic.css?v=0.6">
 <link rel="stylesheet" href="./assets/neon-rims.css?v=0.7">
+<link rel="stylesheet" href="./assets/core-motion.css?v=0.8">
 </head>
 <body>
 <div class="app">
@@ -106,12 +107,18 @@
   <circle cx="160" cy="177" r="40" fill="url(#prism-heart)" opacity=".62"/>
   <path d="M160 145 V209 M128 177 H192" stroke="#aafaff" stroke-opacity=".35"/>
 </g>
-<circle cx="160" cy="178" r="4" fill="#ebffff" class="prism-glow"/>
+<g class="prism-wave-spawn" aria-hidden="true" fill="none" stroke="#74eaff" stroke-width="1.55">
+  <path d="M160 94 L237 137 L160 183 L83 137 Z M83 137 V227 L160 272 L237 227 V137 M160 183 V272" />
+ </g>
+ <g class="prism-wave-recall" aria-hidden="true" fill="none" stroke="#b19aff" stroke-width="1.85">
+  <path d="M160 49 L267 111 L160 173 L53 111 Z M53 111 V237 L160 299 L267 237 V111 M160 173 V299" />
+ </g>
+ <circle cx="160" cy="178" r="4" fill="#ebffff" class="prism-glow"/>
 <circle cx="160" cy="178" r="22" fill="url(#prism-heart)" opacity=".46" class="prism-glow"/>
 </svg></div><div class="platform"></div>
 <div class="panel-layer" id="panels"></div><div class="micro-layer" id="micros"></div>
 <div class="workbench hidden" id="workbench"><article class="deck"><h4>▣　TEST PLAN <b>LIVE</b></h4><p><b>✓</b> Unit tests (36)</p><p><b>✓</b> Integration tests (8)</p><p>○　E2E tests (3)</p><p>○　Coverage ≥ 90%</p></article><article class="deck"><h4>⌘　EXECUTION STREAM</h4><p>12:02:19　› scan --deep --project</p><p>12:02:26　› analyze --impact --tests</p><p><b>12:02:41　✓ plan.generate --e2e</b></p><p>12:03:04　› tests.build --unit</p></article><article class="deck"><h4>⌘　TASK FLOW</h4><p>PLAN　 →　 BUILD　 →　 TEST　 →　 VERIFY</p><div class="graph"><i style="--h:30%"></i><i style="--h:60%"></i><i style="--h:45%"></i><i style="--h:90%"></i><i style="--h:72%"></i><i style="--h:100%"></i></div></article></div>
-<div class="caption"><i></i><span id="sceneStatus">HOLOGRAPHIC WORKSPACE · STANDBY</span>　<span id="count">00 EVENTS</span></div><div class="controls"><button class="primary" id="play">▶ Start demo</button><button id="pause">Ⅱ Pause</button><button id="inject">＋ Inject event</button><button id="reset">↺ Reset</button></div>
+<div class="caption"><i></i><span id="sceneStatus">HOLOGRAPHIC WORKSPACE · STANDBY</span>　<span id="count">00 EVENTS</span></div><div class="controls"><button class="primary" id="play">▶ Start demo</button><button id="pause">Ⅱ Pause</button><button id="coreSpawn" title="触发面板出现与核心共振">+ 核心唤醒</button><button id="coreRecall" title="把最近的面板吸附回核心">↙ 吸附回收</button><button id="inject">＋ Inject event</button><button id="reset">↺ Reset</button></div>
 </section></main></div>
 <footer class="status" aria-label="模拟 AI 工作状态仪表板">
   <article class="status-card"><h3>◇　AI Core</h3><div class="status-body"><div class="energy-arc"><svg viewBox="0 0 44 44" width="37" height="37" aria-hidden="true"><path d="M22 2 L40 12 V32 L22 42 L4 32 V12Z M4 12 L22 24 L40 12 M22 24 V42" stroke="#66eaff" stroke-width="1.4" fill="none"/></svg></div><div><div class="big">98%</div><div class="meter"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div></div></article>
@@ -122,6 +129,7 @@
 </footer>
 </div>
 
+<script src="./assets/core-motion.js?v=0.8"></script>
 <script>
 const layer=document.getElementById('panels'),microLayer=document.getElementById('micros'),deck=document.getElementById('workbench'),status=document.getElementById('sceneStatus'),count=document.getElementById('count');
 const templates=[
@@ -156,6 +164,7 @@ function panel(t){
   p.innerHTML='<div class="panel-head"><span class="icon">'+t.icon+'</span><b>'+t.title+'</b><span class="state">'+t.live+'</span></div><div class="panel-content">'+t.body+'</div>';
   layer.appendChild(p);
   active.push(p);
+  if(window.NeonCoreMotion)window.NeonCoreMotion.spawn(p);
   requestAnimationFrame(()=>requestAnimationFrame(()=>{
     if(!p.classList.contains('retreating')){p.classList.remove('entering');p.classList.add('active')}
   }));
@@ -189,6 +198,7 @@ function micro(){
 }
 function retire(p){
   if(!p||p.classList.contains('retreating'))return;
+  if(window.NeonCoreMotion)window.NeonCoreMotion.recall(p);
   p.classList.remove('active');
   p.classList.add('retreating');
   setTimeout(()=>{p.remove();active=active.filter(x=>x!==p)},1950);
@@ -226,6 +236,12 @@ function reset(){
 }
 document.getElementById('play').onclick=start;document.getElementById('pause').onclick=pause;document.getElementById('inject').onclick=inject;document.getElementById('reset').onclick=reset;
 document.getElementById('newDemo').onclick=()=>{inject();};
+document.getElementById('coreSpawn').onclick=()=>{inject();};
+document.getElementById('coreRecall').onclick=()=>{
+  const candidate=[...active].reverse().find(p=>p.isConnected&&!p.classList.contains('retreating'));
+  if(candidate)retire(candidate);
+  else status.textContent='没有待回收的面板 · 请先触发生成';
+};
 window.setTimeout(start,650);
 </script>
 </body>
